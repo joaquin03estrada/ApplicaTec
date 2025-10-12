@@ -24,10 +24,10 @@ class AuthHelper {
         ),
       );
 
-      print("👉 Resultado autenticación: $didAuthenticate");
+      print("Resultado autenticación: $didAuthenticate");
       return didAuthenticate;
     } catch (e) {
-      print("❌ Error en autenticación biométrica: $e");
+      print("Error en autenticación biométrica: $e");
       return false;
     }
   }

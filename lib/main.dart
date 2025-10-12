@@ -22,7 +22,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       builder: DevicePreview.appBuilder,
       locale: DevicePreview.locale(context),
-      home: Login(),
+      home: MyScaffold(),
+      debugShowCheckedModeBanner: false
     );
   }
 }

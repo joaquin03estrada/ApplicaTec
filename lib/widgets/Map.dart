@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -6,8 +7,9 @@ import 'package:geolocator/geolocator.dart';
 class MyMap extends StatefulWidget {
   final LatLng? markerLocation;
   final String? markerLabel;
+  final bool showAppBar;
 
-  const MyMap({super.key, this.markerLocation, this.markerLabel});
+  const MyMap({super.key, this.markerLocation, this.markerLabel, this.showAppBar = false});
 
   @override
   State<MyMap> createState() => _MyMapState();
@@ -19,33 +21,44 @@ class _MyMapState extends State<MyMap> {
 
   late final LatLngBounds _limitesDelMapa;
   LatLng? _ubicacionActual;
+  StreamSubscription<Position>? _positionSubscription;
 
   @override
   void initState() {
     super.initState();
     _limitesDelMapa = LatLngBounds(_esquinaSW, _esquinaNE);
-    _obtenerUbicacionActual();
+    _iniciarStreamUbicacion();
   }
 
-  Future<void> _obtenerUbicacionActual() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  void _iniciarStreamUbicacion() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) return;
 
-    permission = await Geolocator.checkPermission();
+    LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) return;
     }
     if (permission == LocationPermission.deniedForever) return;
 
-    Geolocator.getPositionStream().listen((Position position) {
+    _positionSubscription = Geolocator.getPositionStream(
+      locationSettings: LocationSettings(
+        accuracy: LocationAccuracy.low, // Ahorra batería
+        distanceFilter: 20,             // Solo si te mueves 20m
+        timeLimit: Duration(seconds: 10), // Actualiza máximo cada 10s
+      ),
+    ).listen((Position position) {
+      if (!mounted) return;
       setState(() {
         _ubicacionActual = LatLng(position.latitude, position.longitude);
       });
     });
+  }
+
+  @override
+  void dispose() {
+    _positionSubscription?.cancel();
+    super.dispose();
   }
 
   @override
@@ -56,6 +69,14 @@ class _MyMapState extends State<MyMap> {
     );
 
     return Scaffold(
+      appBar: widget.showAppBar
+          ? AppBar(
+              title: Text(widget.markerLabel ?? ""),
+              backgroundColor: const Color(0xff1b3a6b),
+              foregroundColor: Colors.white,
+              elevation: 4,
+            )
+          : null,
       body: FlutterMap(
         options: MapOptions(
           initialCenter: _centro,
@@ -63,18 +84,15 @@ class _MyMapState extends State<MyMap> {
           minZoom: 16.0,
           maxZoom: 18.0,
           cameraConstraint: CameraConstraint.contain(
-            bounds: _limitesDelMapa, // Restringe la cámara
+            bounds: _limitesDelMapa,
           ),
         ),
         children: [
-          // 1. Capa base
           TileLayer(
             urlTemplate:
                 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png?api_key=21de99ef-5734-4300-b4c5-1955a10789fa',
             userAgentPackageName: 'com.example.app_mapa_tec',
           ),
-
-          // 2. Imagen superpuesta
           OverlayImageLayer(
             overlayImages: [
               OverlayImage(
@@ -84,8 +102,6 @@ class _MyMapState extends State<MyMap> {
               ),
             ],
           ),
-
-          // 4. Marcador de ubicación
           MarkerLayer(
             markers: [
               if (_ubicacionActual != null &&

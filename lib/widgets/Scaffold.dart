@@ -1,3 +1,4 @@
+import 'package:applicatec/Helpers/DrawerMenu.dart';
 import 'package:applicatec/widgets/News.dart';
 import 'package:applicatec/widgets/Service.dart';
 import 'package:flutter/material.dart';
@@ -5,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:applicatec/Helpers/ExpansionPanel.dart';
 import 'package:applicatec/widgets/Map.dart';
-import 'package:applicatec/widgets/Settings.dart';
 import 'package:applicatec/widgets/login.dart';
 
 class MyScaffold extends StatefulWidget {
@@ -16,7 +16,8 @@ class MyScaffold extends StatefulWidget {
 class _MyScaffoldState extends State<MyScaffold> {
   int myIndex = 0;
 
-  String materia = "INGENIERIA EN SISTEMAS COMPUTACIONALES";
+  final String carreraNomL = "INGENIERIA EN SISTEMAS COMPUTACIONALES";
+  final String carreraNomS = "ING. SIST. COMP.";
 
   String Especialidad = "ING. DE SOFTWARE";
 
@@ -71,7 +72,7 @@ class _MyScaffoldState extends State<MyScaffold> {
               DropdownMenuItem(
                 value: "ING. SIST. COMP.",
                 child: Text(
-                  "INGENIERÍA EN SISTEMAS COMPUTACIONALES",
+                  "INGENIERÍ0A EN SISTEMAS COMPUTACIONALES",
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
@@ -155,7 +156,7 @@ class _MyScaffoldState extends State<MyScaffold> {
                       _buildRow(
                         "Carrera",
                         "Especialidad",
-                        materia,
+                        carreraNomS,
                         Especialidad,
                       ),
                       _buildRow(
@@ -214,7 +215,7 @@ class _MyScaffoldState extends State<MyScaffold> {
 
     MyMap(), // Mapa Tec
 
-    Service(),// Servicios medicos
+    Service(), // Servicios medicos
 
     News(), // Noticias
   ];
@@ -230,29 +231,38 @@ class _MyScaffoldState extends State<MyScaffold> {
                 elevation: 10,
                 shadowColor: Colors.black,
                 titleSpacing: 0,
-                title: Row(
-                  children: [
-                    SvgPicture.asset(
-                      'assets/images/Logo_TecNM_Horizontal_Blanco.svg',
-                      height: 40,
-                      colorFilter: const ColorFilter.mode(
-                        Colors.white,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        materia,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
+                title: Builder(
+                  builder: (context) {
+                    final orientation = MediaQuery.of(context).orientation;
+                    final textoMateria =
+                        orientation == Orientation.portrait
+                            ? carreraNomS
+                            : carreraNomL;
+                    return Row(
+                      children: [
+                        SvgPicture.asset(
+                          'assets/images/Logo_TecNM_Horizontal_Blanco.svg',
+                          height: 40,
+                          colorFilter: const ColorFilter.mode(
+                            Colors.white,
+                            BlendMode.srcIn,
+                          ),
                         ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                    ),
-                  ],
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            textoMateria,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
                 actions: [
                   PopupMenuButton<int>(
@@ -293,101 +303,7 @@ class _MyScaffoldState extends State<MyScaffold> {
               )
               : null,
       //Menu de la izquierda
-      drawer:
-          myIndex == 0
-              ? Drawer(
-                elevation: 0,
-                child: ListView(
-                  children: [
-                    DrawerHeader(
-                      child: Center(
-                        child: SvgPicture.asset(
-                          'assets/images/Logo_TecNM_Horizontal_Blanco.svg',
-                          height: 100,
-                          colorFilter: const ColorFilter.mode(
-                            Color(0xff1b3a6b),
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                      ),
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.home),
-                      title: const Text("Inicio"),
-                      onTap: () {
-                        // Acción al tocar
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.pending_actions_rounded),
-                      title: const Text("Horario"),
-                      onTap: () {
-                        // Acción al tocar
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.collections_bookmark_rounded),
-                      title: const Text("Calificaciones"),
-                      onTap: () {
-                        // Acción al tocar
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.co_present_outlined),
-                      title: const Text("Kárdex"),
-                      onTap: () {
-                        // Acción al tocar
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.list),
-                      title: const Text("Histórico de actividades"),
-                      onTap: () {
-                        // Acción al tocar
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.receipt),
-                      title: const Text("Recibos"),
-                      onTap: () {
-                        // Acción al tocar
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.assignment_add),
-                      title: const Text("Carga de materias"),
-                      onTap: () {
-                        // Acción al tocar
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.confirmation_number_sharp),
-                      title: const Text("Tickets"),
-                      onTap: () {
-                        // Acción al tocar
-                      },
-                    ),
-
-                    Divider(), // Línea divisoria
-
-                    ListTile(
-                      leading: const Icon(Icons.help_outline),
-                      title: const Text("Soporte"),
-                      onTap: () {
-                        // Acción al tocar
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.find_in_page_outlined),
-                      title: const Text("Guia de uso"),
-                      onTap: () {
-                        // Acción al tocar
-                      },
-                    ),
-                  ],
-                ),
-              )
-              : null,
+      drawer: myIndex == 0 ? DrawerMenu() : null,
 
       //Cuerpo de la app
       body: widgetsList[myIndex],
@@ -413,10 +329,8 @@ class _MyScaffoldState extends State<MyScaffold> {
             ),
             label: 'Ambar',
           ),
+          const BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Mapa'),
           const BottomNavigationBarItem(
-            icon: Icon(Icons.map), 
-            label: 'Mapa'),
-            const BottomNavigationBarItem(
             icon: Icon(Icons.medical_services),
             label: "Servicios Medicos",
           ),
@@ -424,7 +338,6 @@ class _MyScaffoldState extends State<MyScaffold> {
             icon: Icon(Icons.newspaper),
             label: "Noticias",
           ),
-          
         ],
       ),
     );
@@ -435,7 +348,7 @@ class _MyScaffoldState extends State<MyScaffold> {
     String label2,
     String value1,
     String value2,
-    ) {
+  ) {
     return TableRow(
       children: [
         Padding(
