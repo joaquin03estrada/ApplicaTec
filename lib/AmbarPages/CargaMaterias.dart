@@ -1,5 +1,6 @@
 import 'package:applicatec/Helpers/DrawerMenu.dart';
 import 'package:applicatec/Helpers/Horario_Helper.dart';
+import 'package:applicatec/Helpers/CargaAcademica.dart';
 import 'package:applicatec/widgets/Login.dart';
 import 'package:applicatec/widgets/Map.dart';
 import 'package:applicatec/widgets/News.dart';
@@ -20,10 +21,11 @@ class _CargamateriasState extends State<Cargamaterias> {
   int myIndex = 0;
 
   late final List<Widget> widgetsList = [
-    SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Text("carga de materias"),
-    ), // Inicio
+    CargaAcademica(
+    nombre: "Jose Joaquin Estrada Mendoza",
+    matricula: "21170312",
+    carreras: ["INGENIERIA EN SISTEMAS COMPUTACIONALES", "INGLES"],
+    ),
 
     MyMap(), // Mapa Tec
 

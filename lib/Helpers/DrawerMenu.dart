@@ -65,7 +65,7 @@ class DrawerMenu extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.co_present_outlined),
+            leading: const Icon(Icons.badge_outlined ),
             title: const Text("Kárdex"),
             onTap: () {
               Navigator.pop(context);

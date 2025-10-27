@@ -1,5 +1,6 @@
 import 'package:applicatec/Helpers/DrawerMenu.dart';
 import 'package:applicatec/Helpers/Horario_Helper.dart';
+import 'package:applicatec/Helpers/TicketsView.dart';
 import 'package:applicatec/widgets/Login.dart';
 import 'package:applicatec/widgets/Map.dart';
 import 'package:applicatec/widgets/News.dart';
@@ -20,10 +21,10 @@ class _TicketsState extends State<Tickets> {
   int myIndex = 0;
 
   late final List<Widget> widgetsList = [
-    SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Text("Tickets"),
-    ), // Inicio
+    
+    TicketsView(
+      
+    ), 
 
     MyMap(), // Mapa Tec
 

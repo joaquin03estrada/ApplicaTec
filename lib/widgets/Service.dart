@@ -30,13 +30,18 @@ class _ServiceState extends State<Service> {
   }
 
   void _verUbicacion(LatLng location) {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => MyMap(markerLocation: location, showAppBar: true),
-    ),
-  );
-}
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder:
+            (context) => MyMap(
+              markerLocation: location,
+              markerLabel: "",
+              showDrawerBackButton: true, 
+            ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -1,6 +1,6 @@
 import 'package:applicatec/Helpers/DrawerMenu.dart';
 import 'package:applicatec/Helpers/Horario_Helper.dart';
-import 'package:applicatec/Helpers/kardex_card.dart';
+import 'package:applicatec/Helpers/HistoricoRecibos.dart';
 import 'package:applicatec/widgets/Login.dart';
 import 'package:applicatec/widgets/Map.dart';
 import 'package:applicatec/widgets/News.dart';
@@ -9,34 +9,21 @@ import 'package:applicatec/widgets/Service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-class Kardex extends StatefulWidget {
+
+class Historicoact extends StatefulWidget {
   @override
-  State<Kardex> createState() => _KardexState();
+  State<Historicoact> createState() => _HistoricoactState();
 }
 
-class _KardexState extends State<Kardex> {
+class _HistoricoactState extends State<Historicoact> {
   final String carreraNomL = "INGENIERIA EN SISTEMAS COMPUTACIONALES";
   final String carreraNomS = "ING. SIST. COMP.";
 
   int myIndex = 0;
 
   late final List<Widget> widgetsList = [
-    SingleChildScrollView(
-      child: Center(
-        child: KardexCard(
-          nombre: "JOSE JOAQUIN ESTRADA MENDOZA",
-          matricula: "21170312",
-          carrera: "INGENIERIA EN SISTEMAS COMPUTACIONALES",
-          especialidad: "ING. DE SOFTWARE",
-          semestre: 9,
-          situacion: "VIGENTE",
-          creditosAcumulados: 203,
-          creditosTotales: 260,
-          periodoIngreso: "2021SEM3",
-          porcentajeAvance: 78.08,
-        ),
-      ), 
-    ), // Inicio
+    
+    HistoricoRecibos(),
 
     MyMap(), // Mapa Tec
 

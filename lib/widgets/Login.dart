@@ -58,7 +58,7 @@ class _LoginState extends State<Login> {
             ),
             elevation: 8,
             margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: Padding(
+            child: Padding( 
               padding: const EdgeInsets.all(24.0),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -75,7 +75,8 @@ class _LoginState extends State<Login> {
                   const SizedBox(height: 20),
 
                   const Text(
-                    "AMBAR CULIACAN",
+                    "INSTITUTO TECNOLOGICO CULIACAN",
+                    textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: "Montserrat",
                       fontSize: 18,

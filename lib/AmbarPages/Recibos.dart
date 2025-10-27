@@ -1,10 +1,12 @@
 import 'package:applicatec/Helpers/DrawerMenu.dart';
 import 'package:applicatec/Helpers/Horario_Helper.dart';
+import 'package:applicatec/Helpers/receipts_section.dart';
 import 'package:applicatec/widgets/Login.dart';
 import 'package:applicatec/widgets/Map.dart';
 import 'package:applicatec/widgets/News.dart';
 import 'package:applicatec/widgets/Scaffold.dart';
 import 'package:applicatec/widgets/Service.dart';
+import 'package:applicatec/AmbarPages/HistoricoAct.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -22,7 +24,33 @@ class _RecibosState extends State<Recibos> {
   late final List<Widget> widgetsList = [
     SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
-      child: Text("Recibos"),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        ReceiptsSection(
+          notices: [
+            const ReceiptNotice(
+              message: 'Para solicitar facturas debe llenar el formulario antes de 2 días.',
+            ),
+            const ReceiptNotice(
+              message: 'Por actualización y mejora de software, Servicios de Banco Santander están siendo actualizados, estos estarán deshabilitados hasta nuevo aviso',
+            ),
+          ],
+          receipts: [
+            Receipt(
+              title: 'APORTACIÓN VOLUNTARIA SEMESTRE AGOSTO-DICIEMBRE 2025 OCTAVO SEMESTRE EN ADELANTE',
+              issueDate: DateTime(2025, 8, 1),
+              dueDate: DateTime(2025, 8, 15),
+              amount: 3200.00,
+              isPaid: true,
+            ),
+          ],
+          onHistoryPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => Historicoact()),
+            );
+          },
+        ),
+      ]),
     ), // Inicio
 
     MyMap(), // Mapa Tec

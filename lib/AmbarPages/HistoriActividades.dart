@@ -1,5 +1,4 @@
 import 'package:applicatec/Helpers/DrawerMenu.dart';
-import 'package:applicatec/Helpers/Horario_Helper.dart';
 import 'package:applicatec/widgets/Login.dart';
 import 'package:applicatec/widgets/Map.dart';
 import 'package:applicatec/widgets/News.dart';
@@ -7,6 +6,7 @@ import 'package:applicatec/widgets/Scaffold.dart';
 import 'package:applicatec/widgets/Service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:applicatec/Helpers/activity_cards.dart';
 
 class Historiactividades extends StatefulWidget {
   @override
@@ -17,12 +17,46 @@ class _HistoriactividadesState extends State<Historiactividades> {
   final String carreraNomL = "INGENIERIA EN SISTEMAS COMPUTACIONALES";
   final String carreraNomS = "ING. SIST. COMP.";
 
+  final actividadViolin = ExtraschoolActivity(
+    code: 'PCD-VIO',
+    name: 'VIOLIN',
+    period: '2022SEM3',
+    score: 4.00,
+    evaluation: 'EXCELENTE',
+    credits: 1,
+  );
+
   int myIndex = 0;
 
   late final List<Widget> widgetsList = [
     SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
-      child: Text("Historial de Actividades"),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ActivityCard(
+            title: 'Actividades complementarias',
+            content: const EmptyActivityContent(
+              message: 'No cuenta con actividades complementarias registradas',
+            ),
+          ),
+          ActivityCard(
+            title: 'Actividades extraescolares',
+            content: ExtraschoolActivityContent(
+              activity: actividadViolin,
+              onDownload: () {
+                
+              },
+            ),
+          ),
+          ActivityCard(
+            title: 'Tutorías',
+            content: const EmptyActivityContent(
+              message: 'No cuenta con tutorías registradas',
+            ),
+          ),
+        ],
+      ),
     ), // Inicio
 
     MyMap(), // Mapa Tec

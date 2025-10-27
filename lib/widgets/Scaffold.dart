@@ -59,51 +59,133 @@ class _MyScaffoldState extends State<MyScaffold> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          DropdownButtonFormField<String>(
-            isExpanded: true,
-            decoration: InputDecoration(
-              labelText: "Selecciona una carrera",
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            value: "ING. SIST. COMP.", // valor inicial
-            items: const [
-              DropdownMenuItem(
-                value: "ING. SIST. COMP.",
-                child: Text(
-                  "INGENIERÍ0A EN SISTEMAS COMPUTACIONALES",
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
+          
+          LayoutBuilder(
+            builder: (context, constraints) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey[300]!),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.2),
+                      spreadRadius: 1,
+                      blurRadius: 3,
+                      offset: Offset(0, 1),
+                    ),
+                  ],
                 ),
-              ),
-              DropdownMenuItem(
-                value: "Ingles",
-                child: Text(
-                  "INGLES",
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: "ING. SIST. COMP.", // valor inicial
+                    icon: Icon(Icons.arrow_drop_down, color: Colors.grey[600]),
+                    isExpanded: true,
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    borderRadius: BorderRadius.circular(8),
+                    itemHeight: null, 
+                    alignment: AlignmentDirectional.centerStart,
+                    items: [
+                      DropdownMenuItem(
+                        value: "ING. SIST. COMP.",
+                        child: Container(
+                          width: constraints.maxWidth - 60, 
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 8.0),
+                            child: Text(
+                              "INGENIERÍA EN SISTEMAS COMPUTACIONALES",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2, 
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: "Ingles",
+                        child: Container(
+                          width: constraints.maxWidth - 60, 
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 8.0),
+                            child: Text(
+                              "INGLES",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      
+                    },
+                    selectedItemBuilder: (context) {
+                      return [
+                        Container(
+                          width: constraints.maxWidth - 60,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                "Selecciona una carrera",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              Text(
+                                "INGENIERÍA EN SISTEMAS COMPUTACIONALES",
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2, // Permite hasta 2 líneas
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          width: constraints.maxWidth - 60,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                "Selecciona una carrera",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              Text(
+                                "INGLES",
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ];
+                    },
+                  ),
                 ),
-              ),
-            ],
-            onChanged: (value) {
-              // Aquí puedes manejar el cambio de carrera
-            },
-
-            selectedItemBuilder: (context) {
-              return [
-                const Text(
-                  "INGENIERÍA EN SISTEMAS COMPUTACIONALES",
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-                const Text(
-                  "INGLES",
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-              ];
-            },
+              );
+            }
           ),
 
           const SizedBox(height: 16),
