@@ -3,6 +3,7 @@ import 'package:applicatec/Helpers/ticket_dialog.dart';
 import 'package:flutter/material.dart';
 
 class CargaAcademica extends StatefulWidget {
+  final String numControl;
   final String nombre;
   final String matricula;
   final List<String> carreras;
@@ -12,6 +13,7 @@ class CargaAcademica extends StatefulWidget {
     required this.nombre,
     required this.matricula,
     required this.carreras,
+    required this.numControl,
   }) : super(key: key);
 
   @override
@@ -257,7 +259,7 @@ class _CargaAcademicaState extends State<CargaAcademica> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => Horario(),
+                      builder: (context) => Horario(numControl: widget.numControl),
                     ),
                   );
                 },

@@ -10,6 +10,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class Kardex extends StatefulWidget {
+  final String numControl;
+
+  const Kardex({Key? key, required this.numControl}) : super(key: key);
   @override
   State<Kardex> createState() => _KardexState();
 }
@@ -128,7 +131,7 @@ class _KardexState extends State<Kardex> {
               )
               : null,
 
-      drawer: DrawerMenu(),
+      drawer: DrawerMenu(numControl: widget.numControl),
 
       body: widgetsList[myIndex],
 
@@ -137,7 +140,7 @@ class _KardexState extends State<Kardex> {
           if (index == 0) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => MyScaffold()),
+              MaterialPageRoute(builder: (context) => MyScaffold(numControl: widget.numControl)),
             );
           } else {
             setState(() {

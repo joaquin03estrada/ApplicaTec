@@ -10,6 +10,9 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Guia extends StatefulWidget {
+  final String numControl;
+
+  const Guia({Key? key, required this.numControl}) : super(key: key);
   @override
   State<Guia> createState() => _GuiaState();
 }
@@ -130,7 +133,7 @@ class _GuiaState extends State<Guia> {
               ],
             )
           : null,
-      drawer: DrawerMenu(),
+      drawer: DrawerMenu(numControl: widget.numControl),
       body: myIndex == 0 
           ? _buildGuiaDeUso()
           : widgetsList[myIndex],
@@ -139,7 +142,7 @@ class _GuiaState extends State<Guia> {
           if (index == 0) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => MyScaffold()),
+              MaterialPageRoute(builder: (context) => MyScaffold(numControl: widget.numControl)),
             );
           } else {
             setState(() {

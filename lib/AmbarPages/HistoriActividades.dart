@@ -9,6 +9,9 @@ import 'package:flutter_svg/svg.dart';
 import 'package:applicatec/Helpers/activity_cards.dart';
 
 class Historiactividades extends StatefulWidget {
+  final String numControl;
+
+  const Historiactividades({Key? key, required this.numControl}) : super(key: key);
   @override
   State<Historiactividades> createState() => _HistoriactividadesState();
 }
@@ -149,7 +152,7 @@ class _HistoriactividadesState extends State<Historiactividades> {
               )
               : null,
 
-      drawer: DrawerMenu(),
+      drawer: DrawerMenu(numControl: widget.numControl),
 
       body: widgetsList[myIndex],
 
@@ -158,7 +161,7 @@ class _HistoriactividadesState extends State<Historiactividades> {
           if (index == 0) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => MyScaffold()),
+              MaterialPageRoute(builder: (context) => MyScaffold(numControl: widget.numControl)),
             );
           } else {
             setState(() {

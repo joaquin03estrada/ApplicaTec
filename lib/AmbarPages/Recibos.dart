@@ -11,6 +11,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class Recibos extends StatefulWidget {
+  final String numControl;
+
+  const Recibos({Key? key, required this.numControl}) : super(key: key);
   @override
   State<Recibos> createState() => _RecibosState();
 }
@@ -46,7 +49,7 @@ class _RecibosState extends State<Recibos> {
           onHistoryPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => Historicoact()),
+              MaterialPageRoute(builder: (context) => Historicoact(numControl: widget.numControl)),
             );
           },
         ),
@@ -143,7 +146,7 @@ class _RecibosState extends State<Recibos> {
               )
               : null,
 
-      drawer: DrawerMenu(),
+      drawer: DrawerMenu(numControl: widget.numControl),
 
       body: widgetsList[myIndex],
 
@@ -152,7 +155,7 @@ class _RecibosState extends State<Recibos> {
           if (index == 0) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => MyScaffold()),
+              MaterialPageRoute(builder: (context) => MyScaffold(numControl: widget.numControl)),
             );
           } else {
             setState(() {

@@ -10,6 +10,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class Tickets extends StatefulWidget {
+  final String numControl;
+
+  const Tickets({Key? key, required this.numControl}) : super(key: key);
   @override
   State<Tickets> createState() => _TicketsState();
 }
@@ -116,7 +119,7 @@ class _TicketsState extends State<Tickets> {
               )
               : null,
 
-      drawer: DrawerMenu(),
+      drawer: DrawerMenu(numControl: widget.numControl),
 
       body: widgetsList[myIndex],
 
@@ -125,7 +128,7 @@ class _TicketsState extends State<Tickets> {
           if (index == 0) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => MyScaffold()),
+              MaterialPageRoute(builder: (context) => MyScaffold(numControl: widget.numControl)),
             );
           } else {
             setState(() {

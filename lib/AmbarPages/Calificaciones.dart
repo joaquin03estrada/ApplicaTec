@@ -10,6 +10,9 @@ import 'package:flutter_svg/svg.dart';
 import 'package:applicatec/Helpers/materia_expansion_panel.dart';
 
 class Calificaciones extends StatefulWidget {
+  final String numControl;
+
+  const Calificaciones({Key? key, required this.numControl}) : super(key: key);
   @override
   State<Calificaciones> createState() => _CalificacionesState();
 }
@@ -17,6 +20,7 @@ class Calificaciones extends StatefulWidget {
 class _CalificacionesState extends State<Calificaciones> {
   final String carreraNomL = "INGENIERIA EN SISTEMAS COMPUTACIONALES";
   final String carreraNomS = "ING. SIST. COMP.";
+  
 
   int myIndex = 0;
 
@@ -363,7 +367,7 @@ class _CalificacionesState extends State<Calificaciones> {
               )
               : null,
 
-      drawer: DrawerMenu(),
+      drawer: DrawerMenu(numControl: widget.numControl),
 
       body: widgetsList[myIndex],
 
@@ -372,7 +376,7 @@ class _CalificacionesState extends State<Calificaciones> {
           if (index == 0) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => MyScaffold()),
+              MaterialPageRoute(builder: (context) => MyScaffold( numControl: widget.numControl)),
             );
           } else {
             setState(() {

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:applicatec/AmbarPages/Recibos.dart';
 
 class HistoricoRecibos extends StatefulWidget {
+  final String numControl;
+
+  const HistoricoRecibos({Key? key, required this.numControl}) : super(key: key);
   @override
   State<HistoricoRecibos> createState() => _HistoricoRecibosState();
 }
@@ -43,7 +46,7 @@ class _HistoricoRecibosState extends State<HistoricoRecibos> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => Recibos()),
+                    MaterialPageRoute(builder: (_) => Recibos(numControl: widget.numControl)),
                   );
                 },
               ),

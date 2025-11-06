@@ -10,6 +10,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class Cargamaterias extends StatefulWidget {
+  final String numControl;
+
+  const Cargamaterias({Key? key, required this.numControl}) : super(key: key);
   @override
   State<Cargamaterias> createState() => _CargamateriasState();
 }
@@ -22,9 +25,10 @@ class _CargamateriasState extends State<Cargamaterias> {
 
   late final List<Widget> widgetsList = [
     CargaAcademica(
-    nombre: "Jose Joaquin Estrada Mendoza",
-    matricula: "21170312",
-    carreras: ["INGENIERIA EN SISTEMAS COMPUTACIONALES", "INGLES"],
+      numControl: widget.numControl,
+      nombre: "Jose Joaquin Estrada Mendoza",
+      matricula: "21170312",
+      carreras: ["INGENIERIA EN SISTEMAS COMPUTACIONALES", "INGLES"],
     ),
 
     MyMap(), // Mapa Tec
@@ -117,7 +121,7 @@ class _CargamateriasState extends State<Cargamaterias> {
               )
               : null,
 
-      drawer: DrawerMenu(),
+      drawer: DrawerMenu( numControl: widget.numControl),
 
       body: widgetsList[myIndex],
 
@@ -126,7 +130,7 @@ class _CargamateriasState extends State<Cargamaterias> {
           if (index == 0) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => MyScaffold()),
+              MaterialPageRoute(builder: (context) => MyScaffold(numControl: widget.numControl)),
             );
           } else {
             setState(() {

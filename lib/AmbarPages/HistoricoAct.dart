@@ -11,6 +11,9 @@ import 'package:flutter_svg/svg.dart';
 
 
 class Historicoact extends StatefulWidget {
+  final String numControl;
+
+  const Historicoact({Key? key, required this.numControl}) : super(key: key);
   @override
   State<Historicoact> createState() => _HistoricoactState();
 }
@@ -23,7 +26,9 @@ class _HistoricoactState extends State<Historicoact> {
 
   late final List<Widget> widgetsList = [
     
-    HistoricoRecibos(),
+    HistoricoRecibos( 
+      numControl: widget.numControl,
+    ),
 
     MyMap(), // Mapa Tec
 
@@ -115,7 +120,7 @@ class _HistoricoactState extends State<Historicoact> {
               )
               : null,
 
-      drawer: DrawerMenu(),
+      drawer: DrawerMenu( numControl: widget.numControl),
 
       body: widgetsList[myIndex],
 
@@ -124,7 +129,7 @@ class _HistoricoactState extends State<Historicoact> {
           if (index == 0) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => MyScaffold()),
+              MaterialPageRoute(builder: (context) => MyScaffold(numControl: widget.numControl)),
             );
           } else {
             setState(() {

@@ -10,9 +10,15 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:applicatec/widgets/Scaffold.dart';
 import 'package:applicatec/AmbarPages/Calificaciones.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:applicatec/widgets/Login.dart';
 
 class DrawerMenu extends StatelessWidget {
-  const DrawerMenu({Key? key}) : super(key: key);
+  final String numControl; // ← Agregar este parámetro
+
+  const DrawerMenu({
+    Key? key,
+    required this.numControl, // ← Hacer que sea requerido
+  }) : super(key: key);
 
   Uri get _url => Uri.parse('https://www.facebook.com/ambartecnm');
 
@@ -29,23 +35,37 @@ class DrawerMenu extends StatelessWidget {
       child: ListView(
         children: [
           DrawerHeader(
-            child: Center(
-              child: SvgPicture.asset(
-                'assets/images/Logo_TecNM_Horizontal_Blanco.svg',
-                height: 100,
-                colorFilter: const ColorFilter.mode(
-                  Color(0xff1b3a6b),
-                  BlendMode.srcIn,
+            decoration: BoxDecoration(
+              color: Color(0xff1b3a6b).withOpacity(0.1),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SvgPicture.asset(
+                  'assets/images/Logo_TecNM_Horizontal_Blanco.svg',
+                  height: 80,
+                  colorFilter: const ColorFilter.mode(
+                    Color(0xff1b3a6b),
+                    BlendMode.srcIn,
+                  ),
                 ),
-              ),
+                SizedBox(height: 8),
+                Text(
+                  'No. Control: $numControl', // ← Mostrar el número de control
+                  style: TextStyle(
+                    color: Color(0xff1b3a6b),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
           ),
           ListTile(
             leading: const Icon(Icons.home),
             title: const Text("Inicio"),
             onTap: () {
-              Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (_) => MyScaffold()));
+              Navigator.pop(context); 
             },
           ),
           ListTile(
@@ -53,7 +73,12 @@ class DrawerMenu extends StatelessWidget {
             title: const Text("Horario"),
             onTap: () {
               Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (_) => Horario()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => Horario(numControl: numControl), // ← Pasar numControl
+                ),
+              );
             },
           ),
           ListTile(
@@ -61,15 +86,25 @@ class DrawerMenu extends StatelessWidget {
             title: const Text("Calificaciones"),
             onTap: () {
               Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (_) => Calificaciones()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => Calificaciones(numControl: numControl), // ← Pasar numControl
+                ),
+              );
             },
           ),
           ListTile(
-            leading: const Icon(Icons.badge_outlined ),
+            leading: const Icon(Icons.badge_outlined),
             title: const Text("Kárdex"),
             onTap: () {
               Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (_) => Kardex()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => Kardex(numControl: numControl), // ← Pasar numControl
+                ),
+              );
             },
           ),
           ListTile(
@@ -77,7 +112,12 @@ class DrawerMenu extends StatelessWidget {
             title: const Text("Histórico de actividades"),
             onTap: () {
               Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (_) => Historiactividades()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => Historiactividades(numControl: numControl), // ← Pasar numControl
+                ),
+              );
             },
           ),
           ListTile(
@@ -85,7 +125,12 @@ class DrawerMenu extends StatelessWidget {
             title: const Text("Recibos"),
             onTap: () {
               Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (_) => Recibos()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => Recibos(numControl: numControl), // ← Pasar numControl
+                ),
+              );
             },
           ),
           ListTile(
@@ -93,7 +138,12 @@ class DrawerMenu extends StatelessWidget {
             title: const Text("Carga de materias"),
             onTap: () {
               Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (_) => Cargamaterias()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => Cargamaterias(numControl: numControl), // ← Pasar numControl
+                ),
+              );
             },
           ),
           ListTile(
@@ -101,7 +151,12 @@ class DrawerMenu extends StatelessWidget {
             title: const Text("Tickets"),
             onTap: () {
               Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (_) => Tickets()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => Tickets(numControl: numControl), // ← Pasar numControl
+                ),
+              );
             },
           ),
           const Divider(),
@@ -114,10 +169,13 @@ class DrawerMenu extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.find_in_page_outlined),
-            title: const Text("Guia de uso"),
+            title: const Text("Guía de uso"),
             onTap: () {
               Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (_) => Guia()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => Guia(numControl: numControl)),
+              );
             },
           ),
         ],

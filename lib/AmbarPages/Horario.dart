@@ -9,6 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class Horario extends StatefulWidget {
+  final String numControl;
+
+  const Horario({Key? key, required this.numControl}) : super(key: key);
   @override
   State<Horario> createState() => _HorarioState();
 }
@@ -115,7 +118,7 @@ class _HorarioState extends State<Horario> {
               )
               : null,
 
-      drawer: DrawerMenu(),
+      drawer: DrawerMenu(numControl: widget.numControl),
 
       body: widgetsList[myIndex],
 
@@ -124,7 +127,7 @@ class _HorarioState extends State<Horario> {
           if (index == 0) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => MyScaffold()),
+              MaterialPageRoute(builder: (context) => MyScaffold( numControl: widget.numControl)),
             );
           } else {
             setState(() {
