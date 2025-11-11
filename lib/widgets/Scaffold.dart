@@ -42,8 +42,6 @@ class _MyScaffoldState extends State<MyScaffold> {
         _errorMessage = null;
       });
 
-      print('Cargando datos para num_control: ${widget.numControl}');
-
       final alumno = await AlumnoService.getAlumnoByNumControl(
         widget.numControl,
       );
@@ -53,7 +51,6 @@ class _MyScaffoldState extends State<MyScaffold> {
           _alumnoData = alumno;
           _isLoading = false;
         });
-        print('Datos cargados exitosamente');
       } else {
         setState(() {
           _isLoading = false;
@@ -70,7 +67,9 @@ class _MyScaffoldState extends State<MyScaffold> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error al cargar los datos del estudiante'),
+            content: Text(
+              'Error al cargar los datos, asegurése de tener conexión a internet.',
+            ),
             backgroundColor: Colors.red,
             action: SnackBarAction(
               label: 'Reintentar',
@@ -170,7 +169,7 @@ class _MyScaffoldState extends State<MyScaffold> {
 
   // Construir AppBar
   AppBar _buildAppBar() {
-    // Usar el nombre completo en landscape, corto en portrait
+    
     final orientation = MediaQuery.of(context).orientation;
     final carrera = _alumnoData?.nombreCarrera ?? 'TecNM Culiacán';
 
@@ -204,25 +203,17 @@ class _MyScaffoldState extends State<MyScaffold> {
           itemBuilder:
               (context) => [
                 PopupMenuItem(
-                  value: 1,
-                  child: Row(
-                    children: const [
-                      Icon(Icons.refresh, color: Colors.grey),
-                      SizedBox(width: 8),
-                      Text("Actualizar datos"),
-                    ],
-                  ),
-                  onTap: () {
-                    Future.delayed(Duration.zero, _loadAlumnoData);
-                  },
-                ),
-                PopupMenuItem(
                   value: 2,
                   child: Row(
                     children: const [
                       Icon(Icons.password, color: Colors.grey),
                       SizedBox(width: 8),
-                      Text("Cambiar Contraseña"),
+                      Flexible(
+                        child: Text(
+                          "Cambiar Contraseña",
+                          style: TextStyle(overflow: TextOverflow.ellipsis),
+                        ),
+                      ),
                     ],
                   ),
                   onTap: () {
@@ -244,7 +235,12 @@ class _MyScaffoldState extends State<MyScaffold> {
                     children: const [
                       Icon(Icons.logout, color: Colors.grey),
                       SizedBox(width: 8),
-                      Text("Cerrar Sesión"),
+                      Flexible(
+                        child: Text(
+                          "Cerrar Sesión",
+                          style: TextStyle(overflow: TextOverflow.ellipsis),
+                        ),
+                      ),
                     ],
                   ),
                   onTap: () async {
@@ -323,13 +319,13 @@ class _MyScaffoldState extends State<MyScaffold> {
             // Información académica
             CustomExpansionPanel(
               icon: Icons.folder_copy_outlined,
-            title: "Información de carga académica",
-            rows: [
-              _buildRow(
-                "Fecha de carga",
-                "Adeudos",
-                "Fecha:${fechacarga.year}-${fechacarga.month}-${fechacarga.day} Hora:${horacarga.hour}:${horacarga.minute.toString().padLeft(2, '0')}",
-                "No cuenta con adeudos",
+              title: "Información de carga académica",
+              rows: [
+                _buildRow(
+                  "Fecha de carga",
+                  "Adeudos",
+                  "Fecha:${fechacarga.year}-${fechacarga.month}-${fechacarga.day} Hora:${horacarga.hour}:${horacarga.minute.toString().padLeft(2, '0')}",
+                  "No cuenta con adeudos",
                 ),
               ],
             ),

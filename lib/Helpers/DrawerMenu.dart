@@ -13,11 +13,11 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:applicatec/widgets/Login.dart';
 
 class DrawerMenu extends StatelessWidget {
-  final String numControl; // ← Agregar este parámetro
+  final String numControl; 
 
   const DrawerMenu({
     Key? key,
-    required this.numControl, // ← Hacer que sea requerido
+    required this.numControl, 
   }) : super(key: key);
 
   Uri get _url => Uri.parse('https://www.facebook.com/ambartecnm');
@@ -49,15 +49,6 @@ class DrawerMenu extends StatelessWidget {
                     BlendMode.srcIn,
                   ),
                 ),
-                SizedBox(height: 8),
-                Text(
-                  'No. Control: $numControl', // ← Mostrar el número de control
-                  style: TextStyle(
-                    color: Color(0xff1b3a6b),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
               ],
             ),
           ),
@@ -66,6 +57,12 @@ class DrawerMenu extends StatelessWidget {
             title: const Text("Inicio"),
             onTap: () {
               Navigator.pop(context); 
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => MyScaffold(numControl: numControl), 
+                ),
+              );
             },
           ),
           ListTile(
@@ -76,7 +73,7 @@ class DrawerMenu extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => Horario(numControl: numControl), // ← Pasar numControl
+                  builder: (_) => Horario(numControl: numControl), 
                 ),
               );
             },
@@ -89,7 +86,7 @@ class DrawerMenu extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => Calificaciones(numControl: numControl), // ← Pasar numControl
+                  builder: (_) => Calificaciones(numControl: numControl), 
                 ),
               );
             },
@@ -102,7 +99,7 @@ class DrawerMenu extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => Kardex(numControl: numControl), // ← Pasar numControl
+                  builder: (_) => Kardex(numControl: numControl), 
                 ),
               );
             },
@@ -115,7 +112,7 @@ class DrawerMenu extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => Historiactividades(numControl: numControl), // ← Pasar numControl
+                  builder: (_) => Historiactividades(numControl: numControl), 
                 ),
               );
             },
@@ -128,7 +125,7 @@ class DrawerMenu extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => Recibos(numControl: numControl), // ← Pasar numControl
+                  builder: (_) => Recibos(numControl: numControl), 
                 ),
               );
             },
@@ -141,7 +138,7 @@ class DrawerMenu extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => Cargamaterias(numControl: numControl), // ← Pasar numControl
+                  builder: (_) => Cargamaterias(numControl: numControl), 
                 ),
               );
             },
@@ -154,7 +151,7 @@ class DrawerMenu extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => Tickets(numControl: numControl), // ← Pasar numControl
+                  builder: (_) => Tickets(numControl: numControl), 
                 ),
               );
             },
