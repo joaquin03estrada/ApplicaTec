@@ -8,8 +8,10 @@ import 'package:applicatec/widgets/Service.dart';
 import 'package:applicatec/AmbarPages/HistoricoAct.dart';
 import 'package:applicatec/Helpers/ChangePassword.dart';
 import 'package:applicatec/Helpers/SecureStorage.dart';
-import 'package:applicatec/models/AlumnoModel.dart';
+import 'package:applicatec/Models/AlumnoModel.dart';
+import 'package:applicatec/models/ReciboModel.dart';
 import 'package:applicatec/services/AlumnoService.dart';
+import 'package:applicatec/services/ReciboService.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -26,12 +28,16 @@ class _RecibosState extends State<Recibos> {
   bool _isLoading = true;
   String? _errorMessage;
 
+  ReciboModel? _reciboReciente;
+  bool _isLoadingRecibo = true;
+
   int myIndex = 0;
 
   @override
   void initState() {
     super.initState();
     _loadAlumnoData();
+    _loadReciboReciente();
   }
 
   Future<void> _loadAlumnoData() async {
@@ -64,53 +70,23 @@ class _RecibosState extends State<Recibos> {
     }
   }
 
-  late final List<Widget> widgetsList = [
-    SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ReceiptsSection(
-            notices: [
-              const ReceiptNotice(
-                message:
-                    'Para solicitar facturas debe llenar el formulario antes de 2 días.',
-              ),
-              const ReceiptNotice(
-                message:
-                    'Por actualización y mejora de software, Servicios de Banco Santander están siendo actualizados, estos estarán deshabilitados hasta nuevo aviso',
-              ),
-            ],
-            receipts: [
-              Receipt(
-                title:
-                    'APORTACIÓN VOLUNTARIA SEMESTRE AGOSTO-DICIEMBRE 2025 OCTAVO SEMESTRE EN ADELANTE',
-                issueDate: DateTime(2025, 8, 1),
-                dueDate: DateTime(2025, 8, 15),
-                amount: 3200.00,
-                isPaid: true,
-              ),
-            ],
-            onHistoryPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder:
-                      (context) => Historicoact(numControl: widget.numControl),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-    ), // Inicio
+  Future<void> _loadReciboReciente() async {
+    try {
+      setState(() => _isLoadingRecibo = true);
 
-    MyMap(), // Mapa Tec
+      final recibo = await ReciboService.getReciboMasReciente(
+        widget.numControl,
+      );
 
-    Service(), // Servicios medicos
-
-    News(), // Noticias
-  ];
+      setState(() {
+        _reciboReciente = recibo;
+        _isLoadingRecibo = false;
+      });
+    } catch (e) {
+      print('Error cargando recibo reciente: $e');
+      setState(() => _isLoadingRecibo = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -121,12 +97,63 @@ class _RecibosState extends State<Recibos> {
       );
     }
 
+    final widgetsList = [
+      SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ReceiptsSection(
+              notices: [
+                const ReceiptNotice(
+                  message:
+                      'Para solicitar facturas debe llenar el formulario antes de 2 días.',
+                ),
+                const ReceiptNotice(
+                  message:
+                      'Por actualización y mejora de software, Servicios de Banco Santander están siendo actualizados, estos estarán deshabilitados hasta nuevo aviso',
+                ),
+              ],
+              receipts: _buildReceipts(),
+              isLoading: _isLoadingRecibo,
+              onHistoryPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        Historicoact(numControl: widget.numControl),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+      MyMap(),
+      Service(),
+      News(),
+    ];
+
     return Scaffold(
       appBar: myIndex == 0 ? _buildAppBar() : null,
       drawer: myIndex == 0 ? DrawerMenu(numControl: widget.numControl) : null,
       body: widgetsList[myIndex],
       bottomNavigationBar: _buildBottomNavigationBar(),
     );
+  }
+
+  List<Receipt> _buildReceipts() {
+    if (_reciboReciente == null) return [];
+
+    return [
+      Receipt(
+        title: _reciboReciente!.descripcion ?? 'Sin descripción',
+        issueDate: _reciboReciente!.emision ?? DateTime.now(),
+        dueDate: _reciboReciente!.vigencia ?? DateTime.now(),
+        amount: _reciboReciente!.importe ?? 0.0,
+        isPaid: _reciboReciente!.isPaid,
+      ),
+    ];
   }
 
   AppBar _buildAppBar() {
@@ -159,58 +186,56 @@ class _RecibosState extends State<Recibos> {
       actions: [
         PopupMenuButton<int>(
           icon: const Icon(Icons.person, color: Colors.white),
-          itemBuilder:
-              (context) => [
-                PopupMenuItem(
-                  value: 1,
-                  child: Row(
-                    children: const [
-                      Icon(Icons.password, color: Colors.grey),
-                      SizedBox(width: 8),
-                      Flexible(
-                        child: Text(
-                          "Cambiar Contraseña",
-                          style: TextStyle(overflow: TextOverflow.ellipsis),
-                        ),
-                      ),
-                    ],
+          itemBuilder: (context) => [
+            PopupMenuItem(
+              value: 1,
+              child: Row(
+                children: const [
+                  Icon(Icons.password, color: Colors.grey),
+                  SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      "Cambiar Contraseña",
+                      style: TextStyle(overflow: TextOverflow.ellipsis),
+                    ),
                   ),
-                  onTap: () {
-                    Future.delayed(Duration.zero, () {
-                      showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder:
-                            (context) => ChangePasswordDialog(
-                              numControl: widget.numControl,
-                            ),
-                      );
-                    });
-                  },
-                ),
-                PopupMenuItem(
-                  value: 2,
-                  child: Row(
-                    children: const [
-                      Icon(Icons.logout, color: Colors.grey),
-                      SizedBox(width: 8),
-                      Flexible(
-                        child: Text(
-                          "Cerrar Sesión",
-                          style: TextStyle(overflow: TextOverflow.ellipsis),
-                        ),
-                      ),
-                    ],
+                ],
+              ),
+              onTap: () {
+                Future.delayed(Duration.zero, () {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (context) => ChangePasswordDialog(
+                      numControl: widget.numControl,
+                    ),
+                  );
+                });
+              },
+            ),
+            PopupMenuItem(
+              value: 2,
+              child: Row(
+                children: const [
+                  Icon(Icons.logout, color: Colors.grey),
+                  SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      "Cerrar Sesión",
+                      style: TextStyle(overflow: TextOverflow.ellipsis),
+                    ),
                   ),
-                  onTap: () async {
-                    await SecureStorageHelper.deleteAllData();
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => Login()),
-                    );
-                  },
-                ),
-              ],
+                ],
+              ),
+              onTap: () async {
+                await SecureStorageHelper.deleteAllData();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => Login()),
+                );
+              },
+            ),
+          ],
         ),
       ],
     );

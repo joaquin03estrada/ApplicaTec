@@ -2,14 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:applicatec/Helpers/ticket_dialog.dart';
 
 class TicketsView extends StatefulWidget {
-  // Podemos pasar listas de tickets como parámetros opcionales
+  final String numControl;
   final List<Ticket>? ticketsAbiertos;
   final List<Ticket>? ticketsFinalizados;
+  final bool isLoading;
+  final Function(String, String)? onTicketCreated;
+  final VoidCallback? onRefresh;
   
   const TicketsView({
     Key? key,
+    required this.numControl,
     this.ticketsAbiertos,
     this.ticketsFinalizados,
+    this.isLoading = false,
+    this.onTicketCreated,
+    this.onRefresh,
   }) : super(key: key);
 
   @override
@@ -37,7 +44,6 @@ class _TicketsViewState extends State<TicketsView> with SingleTickerProviderStat
   
   @override
   Widget build(BuildContext context) {
-    // Obtener el factor de escala de texto y la orientación
     final textScaleFactor = MediaQuery.of(context).textScaleFactor;
     final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
     
@@ -53,14 +59,13 @@ class _TicketsViewState extends State<TicketsView> with SingleTickerProviderStat
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Encabezado y botón de generación de ticket
               Row(
                 children: [
                   Expanded(
                     child: Text(
                       'Tickets',
                       style: TextStyle(
-                        fontSize: isLandscape ? 24 : 28, // Tamaño más pequeño en modo horizontal
+                        fontSize: isLandscape ? 24 : 28,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF1a365d),
                       ),
@@ -69,8 +74,14 @@ class _TicketsViewState extends State<TicketsView> with SingleTickerProviderStat
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      // Mostrar el diálogo de generación de ticket
-                      TicketDialog.show(context);
+                      TicketDialog.show(
+                        context,
+                        onConfirm: (tipo, observaciones) {
+                          if (widget.onTicketCreated != null) {
+                            widget.onTicketCreated!(tipo, observaciones);
+                          }
+                        },
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFF1a365d),
@@ -88,9 +99,8 @@ class _TicketsViewState extends State<TicketsView> with SingleTickerProviderStat
                 ],
               ),
               
-              SizedBox(height: isLandscape ? 16 : 24), // Espacio reducido en horizontal
+              SizedBox(height: isLandscape ? 16 : 24),
               
-              // Pestañas para tickets abiertos y finalizados
               Container(
                 decoration: BoxDecoration(
                   border: Border(
@@ -104,7 +114,7 @@ class _TicketsViewState extends State<TicketsView> with SingleTickerProviderStat
                   indicatorColor: Color(0xFF1a365d),
                   indicatorWeight: 3,
                   labelStyle: TextStyle(
-                    fontSize: 14 / (textScaleFactor > 1.3 ? textScaleFactor * 0.7 : 1), // Reducir tamaño si la escala es muy grande
+                    fontSize: 14 / (textScaleFactor > 1.3 ? textScaleFactor * 0.7 : 1),
                     fontWeight: FontWeight.bold,
                   ),
                   tabs: [
@@ -114,21 +124,17 @@ class _TicketsViewState extends State<TicketsView> with SingleTickerProviderStat
                 ),
               ),
               
-              SizedBox(height: isLandscape ? 8 : 16), // Espacio reducido en horizontal
+              SizedBox(height: isLandscape ? 8 : 16),
               
-              // Contenido de las pestañas
               Container(
-                height: 400, // Altura fija para las tablas
+                height: 400,
                 child: TabBarView(
                   controller: _tabController,
                   children: [
-                    // Pestaña de tickets ABIERTOS
                     _buildTicketsTable(
-                      headers: ['Fecha', 'Clave', 'Descripción', 'Estatus', 'Editar'],
+                      headers: ['Fecha', 'Clave', 'Descripción', 'Estatus'],
                       tickets: widget.ticketsAbiertos,
                     ),
-                    
-                    // Pestaña de tickets FINALIZADOS
                     _buildTicketsTable(
                       headers: ['Fecha', 'Clave', 'Descripción', 'Estatus', 'Comentario'],
                       tickets: widget.ticketsFinalizados,
@@ -137,7 +143,6 @@ class _TicketsViewState extends State<TicketsView> with SingleTickerProviderStat
                 ),
               ),
               
-              // Controles de paginación
               Container(
                 padding: const EdgeInsets.symmetric(
                   vertical: 12.0,
@@ -150,7 +155,6 @@ class _TicketsViewState extends State<TicketsView> with SingleTickerProviderStat
                 ),
               ),
               
-              // Indicador de desplazamiento horizontal
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.only(top: 8.0),
@@ -180,14 +184,11 @@ class _TicketsViewState extends State<TicketsView> with SingleTickerProviderStat
     );
   }
   
-  // Método separado para construir los controles de paginación
   Widget _buildPaginationControls(double availableWidth) {
-    // Para pantallas pequeñas
     if (availableWidth < 500) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Selector de elementos por página adaptable
           FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
@@ -237,7 +238,6 @@ class _TicketsViewState extends State<TicketsView> with SingleTickerProviderStat
 
           SizedBox(height: 12),
 
-          // Información y navegación de páginas
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -271,11 +271,9 @@ class _TicketsViewState extends State<TicketsView> with SingleTickerProviderStat
         ],
       );
     } else {
-      // Para pantallas más grandes
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Selector de elementos por página adaptable
           FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
@@ -323,7 +321,6 @@ class _TicketsViewState extends State<TicketsView> with SingleTickerProviderStat
             ),
           ),
 
-          // Información y navegación de páginas
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -356,7 +353,6 @@ class _TicketsViewState extends State<TicketsView> with SingleTickerProviderStat
     }
   }
   
-  // Método para crear botones de paginación uniformes
   Widget _buildPageButton(IconData icon, bool isActive, VoidCallback onPressed) {
     return Container(
       width: 28,
@@ -372,22 +368,23 @@ class _TicketsViewState extends State<TicketsView> with SingleTickerProviderStat
     );
   }
   
-  // Método para construir la tabla de tickets con manejo de desbordamiento
   Widget _buildTicketsTable({
     required List<String> headers,
     List<Ticket>? tickets,
   }) {
+    // Determinar si es la pestaña de finalizados (tiene columna comentario)
+    final bool isFinalizados = headers.contains('Comentario');
+    
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Encabezados de la tabla dentro de un SingleChildScrollView horizontal
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             controller: _horizontalScrollController,
             child: ConstrainedBox(
               constraints: BoxConstraints(
-                minWidth: MediaQuery.of(context).size.width - 64, // Ancho mínimo con padding
+                minWidth: MediaQuery.of(context).size.width - 64,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -407,7 +404,7 @@ class _TicketsViewState extends State<TicketsView> with SingleTickerProviderStat
                       child: Row(
                         children: [
                           Container(
-                            width: 100, // Ancho fijo para fecha
+                            width: 100,
                             child: Text(
                               'Fecha',
                               style: TextStyle(
@@ -417,9 +414,9 @@ class _TicketsViewState extends State<TicketsView> with SingleTickerProviderStat
                               ),
                             ),
                           ),
-                          SizedBox(width: 16), // Espacio adicional entre columnas
+                          SizedBox(width: 16),
                           Container(
-                            width: 80, // Ancho fijo para clave
+                            width: 80,
                             child: Text(
                               'Clave',
                               style: TextStyle(
@@ -429,9 +426,9 @@ class _TicketsViewState extends State<TicketsView> with SingleTickerProviderStat
                               ),
                             ),
                           ),
-                          SizedBox(width: 16), // Espacio adicional entre columnas
+                          SizedBox(width: 16),
                           Container(
-                            width: 200, // Ancho fijo para descripción
+                            width: 200,
                             child: Text(
                               'Descripción',
                               style: TextStyle(
@@ -441,9 +438,9 @@ class _TicketsViewState extends State<TicketsView> with SingleTickerProviderStat
                               ),
                             ),
                           ),
-                          SizedBox(width: 16), // Espacio adicional entre columnas
+                          SizedBox(width: 16),
                           Container(
-                            width: 100, // Ancho fijo para estatus
+                            width: 100,
                             child: Text(
                               'Estatus',
                               style: TextStyle(
@@ -453,27 +450,35 @@ class _TicketsViewState extends State<TicketsView> with SingleTickerProviderStat
                               ),
                             ),
                           ),
-                          SizedBox(width: 16), // Espacio adicional entre columnas
-                          Container(
-                            width: 100, // Ancho fijo para acción
-                            child: Text(
-                              _tabController.index == 0 ? 'Editar' : 'Comentario',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF1a365d),
-                                fontSize: 14,
+                          if (isFinalizados) ...[
+                            SizedBox(width: 16),
+                            Container(
+                              width: 150,
+                              child: Text(
+                                'Comentario',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF1a365d),
+                                  fontSize: 14,
+                                ),
                               ),
                             ),
-                          ),
+                          ],
                         ],
                       ),
                     ),
                   ),
 
-                  // Si no hay tickets, mostrar mensaje "No hay datos disponibles"
-                  if (tickets == null || tickets.isEmpty)
+                  if (widget.isLoading)
                     Container(
-                      width: 100 + 80 + 200 + 100 + 100 + 16*4, // Suma de todos los anchos + espaciado
+                      width: isFinalizados ? 646 : 496,
+                      height: 300,
+                      alignment: Alignment.center,
+                      child: CircularProgressIndicator(color: Color(0xFF1a365d)),
+                    )
+                  else if (tickets == null || tickets.isEmpty)
+                    Container(
+                      width: isFinalizados ? 646 : 496,
                       height: 300,
                       alignment: Alignment.center,
                       child: Text(
@@ -485,11 +490,10 @@ class _TicketsViewState extends State<TicketsView> with SingleTickerProviderStat
                       ),
                     )
                   else
-                    // Aquí iría el código para mostrar la lista de tickets
                     Column(
                       children: tickets.map((ticket) {
                         return Container(
-                          padding: EdgeInsets.symmetric(vertical: 12),
+                          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                           decoration: BoxDecoration(
                             border: Border(
                               bottom: BorderSide(color: Colors.grey.shade200),
@@ -498,32 +502,26 @@ class _TicketsViewState extends State<TicketsView> with SingleTickerProviderStat
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Fecha
                               Container(
                                 width: 100,
-                                padding: EdgeInsets.symmetric(horizontal: 8),
                                 child: Text(
                                   ticket.fecha,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(fontSize: 13),
                                 ),
                               ),
-                              SizedBox(width: 8),
-                              // Clave
+                              SizedBox(width: 16),
                               Container(
                                 width: 80,
-                                padding: EdgeInsets.symmetric(horizontal: 8),
                                 child: Text(
                                   ticket.clave,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(fontSize: 13),
                                 ),
                               ),
-                              SizedBox(width: 8),
-                              // Descripción
+                              SizedBox(width: 16),
                               Container(
                                 width: 200,
-                                padding: EdgeInsets.symmetric(horizontal: 8),
                                 child: Text(
                                   ticket.descripcion,
                                   maxLines: 2,
@@ -531,38 +529,27 @@ class _TicketsViewState extends State<TicketsView> with SingleTickerProviderStat
                                   style: TextStyle(fontSize: 13),
                                 ),
                               ),
-                              SizedBox(width: 8),
-                              // Estatus
+                              SizedBox(width: 16),
                               Container(
                                 width: 100,
-                                padding: EdgeInsets.symmetric(horizontal: 8),
                                 child: Text(
                                   ticket.estatus,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(fontSize: 13),
                                 ),
                               ),
-                              SizedBox(width: 8),
-                              // Acción (Editar o Comentario)
-                              Container(
-                                width: 100,
-                                padding: EdgeInsets.symmetric(horizontal: 8),
-                                child: _tabController.index == 0
-                                  ? IconButton(
-                                      icon: Icon(Icons.edit, color: Colors.blue, size: 18),
-                                      padding: EdgeInsets.zero,
-                                      constraints: BoxConstraints(),
-                                      onPressed: () {
-                                        // Acción para editar ticket
-                                      },
-                                    )
-                                  : Text(
-                                      ticket.comentario ?? '',
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(fontSize: 13),
-                                    ),
-                              ),
+                              if (isFinalizados) ...[
+                                SizedBox(width: 16),
+                                Container(
+                                  width: 150,
+                                  child: Text(
+                                    ticket.comentario ?? '',
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(fontSize: 13),
+                                  ),
+                                ),
+                              ],
                             ],
                           ),
                         );
@@ -584,7 +571,7 @@ class Ticket {
   final String clave;
   final String descripcion;
   final String estatus;
-  final String? comentario; // Solo para tickets finalizados
+  final String? comentario;
   
   Ticket({
     required this.fecha,

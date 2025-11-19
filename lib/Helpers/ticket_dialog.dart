@@ -263,7 +263,7 @@ class _TicketDialogState extends State<TicketDialog> {
                     ],
                   ),
                 ),
-              ],
+              ], 
             ),
           ),
         ),

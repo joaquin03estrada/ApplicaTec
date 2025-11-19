@@ -1,5 +1,4 @@
 import 'package:applicatec/Helpers/DrawerMenu.dart';
-import 'package:applicatec/Helpers/Horario_Helper.dart';
 import 'package:applicatec/Helpers/TicketsView.dart';
 import 'package:applicatec/widgets/Login.dart';
 import 'package:applicatec/widgets/Map.dart';
@@ -8,8 +7,10 @@ import 'package:applicatec/widgets/Scaffold.dart';
 import 'package:applicatec/widgets/Service.dart';
 import 'package:applicatec/Helpers/ChangePassword.dart';
 import 'package:applicatec/Helpers/SecureStorage.dart';
-import 'package:applicatec/models/AlumnoModel.dart';
+import 'package:applicatec/Models/AlumnoModel.dart';
+import 'package:applicatec/Models/TicketModel.dart';
 import 'package:applicatec/services/AlumnoService.dart';
+import 'package:applicatec/services/TicketService.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -26,12 +27,17 @@ class _TicketsState extends State<Tickets> {
   bool _isLoading = true;
   String? _errorMessage;
 
+  List<TicketModel> _ticketsAbiertos = [];
+  List<TicketModel> _ticketsFinalizados = [];
+  bool _isLoadingTickets = true;
+
   int myIndex = 0;
 
   @override
   void initState() {
     super.initState();
     _loadAlumnoData();
+    _loadTickets();
   }
 
   Future<void> _loadAlumnoData() async {
@@ -64,17 +70,66 @@ class _TicketsState extends State<Tickets> {
     }
   }
 
-  late final List<Widget> widgetsList = [
-    TicketsView(),
+  Future<void> _loadTickets() async {
+    try {
+      setState(() => _isLoadingTickets = true);
 
-    MyMap(), // Mapa Tec
+      final abiertos = await TicketService.getTicketsAbiertos(widget.numControl);
+      final finalizados = await TicketService.getTicketsFinalizados(widget.numControl);
 
-    Service(), // Servicios medicos
+      setState(() {
+        _ticketsAbiertos = abiertos;
+        _ticketsFinalizados = finalizados;
+        _isLoadingTickets = false;
+      });
+    } catch (e) {
+      print('Error cargando tickets: $e');
+      setState(() => _isLoadingTickets = false);
+    }
+  }
 
-    News(), // Noticias
-  ];
+  Future<void> _handleCrearTicket(String tipo, String observaciones) async {
+    // Mostrar indicador de carga
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Center(
+        child: CircularProgressIndicator(color: Color(0xff1b3a6b)),
+      ),
+    );
 
-   @override
+    final descripcion = '$tipo - $observaciones';
+    final success = await TicketService.crearTicket(
+      numControl: widget.numControl,
+      descripcion: descripcion,
+    );
+
+    // Cerrar el indicador de carga
+    Navigator.pop(context);
+
+    if (success) {
+      // Recargar tickets
+      await _loadTickets();
+
+      // Mostrar mensaje de éxito
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Ticket creado exitosamente'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      // Mostrar mensaje de error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al crear el ticket'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Scaffold(
@@ -84,6 +139,20 @@ class _TicketsState extends State<Tickets> {
         ),
       );
     }
+
+    final widgetsList = [
+      TicketsView(
+        numControl: widget.numControl,
+        ticketsAbiertos: _ticketsAbiertos.map((t) => t.toTicket()).toList(),
+        ticketsFinalizados: _ticketsFinalizados.map((t) => t.toTicket()).toList(),
+        isLoading: _isLoadingTickets,
+        onTicketCreated: _handleCrearTicket,
+        onRefresh: _loadTickets,
+      ),
+      MyMap(),
+      Service(),
+      News(),
+    ];
 
     return Scaffold(
       appBar: myIndex == 0 ? _buildAppBar() : null,

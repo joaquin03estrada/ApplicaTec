@@ -1,5 +1,6 @@
 import 'package:applicatec/AmbarPages/Horario.dart';
 import 'package:applicatec/Helpers/ticket_dialog.dart';
+import 'package:applicatec/services/TicketService.dart';
 import 'package:flutter/material.dart';
 
 class CargaAcademica extends StatefulWidget {
@@ -22,13 +23,57 @@ class CargaAcademica extends StatefulWidget {
 
 class _CargaAcademicaState extends State<CargaAcademica> {
   late String _selectedCarrera;
-  bool _fueraDeHorario =
-      true; // Estado para mostrar mensaje de fuera de horario
+  bool _fueraDeHorario = true;
+  bool _isCreatingTicket = false;
 
   @override
   void initState() {
     super.initState();
     _selectedCarrera = widget.carreras.isNotEmpty ? widget.carreras.first : "";
+  }
+
+  Future<void> _handleCrearTicket(String tipo, String observaciones) async {
+    setState(() => _isCreatingTicket = true);
+
+    // Mostrar indicador de carga
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Center(
+        child: CircularProgressIndicator(color: Color(0xff1b3a6b)),
+      ),
+    );
+
+    final descripcion = '$tipo - $observaciones';
+    final success = await TicketService.crearTicket(
+      numControl: widget.numControl,
+      descripcion: descripcion,
+    );
+
+    // Cerrar el indicador de carga
+    Navigator.pop(context);
+
+    setState(() => _isCreatingTicket = false);
+
+    if (success) {
+      // Mostrar mensaje de éxito
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Ticket generado con éxito'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 3),
+        ),
+      );
+    } else {
+      // Mostrar mensaje de error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al generar el ticket. Inténtalo de nuevo.'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
+        ),
+      );
+    }
   }
 
   @override
@@ -89,95 +134,6 @@ class _CargaAcademicaState extends State<CargaAcademica> {
                       widget.matricula,
                       style: TextStyle(fontSize: 16, color: Color(0xFF1a365d)),
                     ),
-
-                    SizedBox(height: 20),
-
-                    // Selector de carrera con estilo personalizado del código proporcionado
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        return Container(
-                          width: constraints.maxWidth,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.grey[300]!),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.2),
-                                spreadRadius: 1,
-                                blurRadius: 3,
-                                offset: Offset(0, 1),
-                              ),
-                            ],
-                          ),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<String>(
-                              value: _selectedCarrera,
-                              icon: Icon(
-                                Icons.arrow_drop_down,
-                                color: Colors.grey[600],
-                              ),
-                              isExpanded: true,
-                              itemHeight: null,
-                              padding: EdgeInsets.symmetric(horizontal: 16),
-                              borderRadius: BorderRadius.circular(8),
-                              alignment: AlignmentDirectional.centerStart,
-                              items:
-                                  widget.carreras.map((String option) {
-                                    return DropdownMenuItem<String>(
-                                      value: option,
-                                      child: Padding(
-                                        padding: EdgeInsets.symmetric(
-                                          vertical: 8.0,
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            if (option == _selectedCarrera)
-                                              Container(
-                                                width:
-                                                    constraints.maxWidth - 60,
-                                                child: Text(
-                                                  "Selecciona una carrera",
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.grey[600],
-                                                  ),
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                            Container(
-                                              width: constraints.maxWidth - 60,
-                                              child: Text(
-                                                option,
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                                overflow: TextOverflow.ellipsis,
-                                                maxLines: 2,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
-                              onChanged: (String? newValue) {
-                                if (newValue != null) {
-                                  setState(() {
-                                    _selectedCarrera = newValue;
-                                  });
-                                }
-                              },
-                            ),
-                          ),
-                        );
-                      },
-                    ),
                   ],
                 ),
               ),
@@ -189,24 +145,19 @@ class _CargaAcademicaState extends State<CargaAcademica> {
               child: ElevatedButton.icon(
                 icon: Icon(Icons.confirmation_number_sharp),
                 label: Text("TICKET"),
-                onPressed: () {
-                  TicketDialog.show(
-                    context,
-                    onConfirm: (ticketType, observations) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'Ticket generado con éxito',
-                          ),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
-                    },
-                  );
-                },
+                onPressed: _isCreatingTicket
+                    ? null
+                    : () {
+                        TicketDialog.show(
+                          context,
+                          onConfirm: _handleCrearTicket,
+                        );
+                      },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF1a365d),
                   foregroundColor: Colors.white,
+                  disabledBackgroundColor: Colors.grey,
+                  disabledForegroundColor: Colors.white70,
                   padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),

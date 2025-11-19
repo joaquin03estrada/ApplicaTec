@@ -1,10 +1,9 @@
-import 'package:applicatec/Models/ClaseModel.dart';
+import 'package:applicatec/models/ClaseModel.dart';
 
 class ClaseEstudianteModel {
   final String numControl;
   final String idClase;
 
-  // Datos de relaciones
   final ClaseModel? clase;
 
   ClaseEstudianteModel({

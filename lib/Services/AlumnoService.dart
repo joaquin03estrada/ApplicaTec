@@ -1,5 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:applicatec/models/AlumnoModel.dart';
+import 'package:applicatec/Models/AlumnoModel.dart';
 import 'dart:async';
 
 class AlumnoService {

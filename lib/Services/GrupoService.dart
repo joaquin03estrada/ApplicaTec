@@ -1,5 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:applicatec/models/GrupoModel.dart';
+import 'package:applicatec/Models/GrupoModel.dart';
 
 class GrupoService {
   static final supabase = Supabase.instance.client;

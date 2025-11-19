@@ -1,12 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:applicatec/models/ClaseModel.dart';
-import 'package:applicatec/services/ClaseService.dart';
+import 'package:applicatec/Models/ClaseModel.dart';
+import 'package:applicatec/Services/ClaseService.dart';
+import 'package:applicatec/widgets/Map.dart';
+import 'package:applicatec/constantes/salones_ubicaciones.dart';
+import 'package:latlong2/latlong.dart';
 
 final List<String> dias = ["Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom"];
 final List<String> horas = [
-  "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", 
-  "13:00", "14:00", "15:00", "16:00", "17:00", "18:00",
-  "19:00", "20:00"
+  "07:00",
+  "08:00",
+  "09:00",
+  "10:00",
+  "11:00",
+  "12:00",
+  "13:00",
+  "14:00",
+  "15:00",
+  "16:00",
+  "17:00",
+  "18:00",
+  "19:00",
+  "20:00",
 ];
 
 final List<Color> coloresMaterias = [
@@ -47,12 +61,14 @@ class _HorarioWidgetState extends State<HorarioWidget> {
     try {
       setState(() => _isLoading = true);
 
-      final clases = await ClaseService.getClasesPorEstudiante(widget.numControl);
+      final clases = await ClaseService.getClasesPorEstudiante(
+        widget.numControl,
+      );
 
-      _asignarColoresYOrganizar(clases);
+      _asignarColoresYOrganizar(clases.cast<ClaseModel>());
 
       setState(() {
-        _clases = clases;
+        _clases = clases.cast<ClaseModel>();
         _isLoading = false;
       });
     } catch (e) {
@@ -63,28 +79,29 @@ class _HorarioWidgetState extends State<HorarioWidget> {
 
   void _asignarColoresYOrganizar(List<ClaseModel> clases) {
     int colorIndex = 0;
-    
+
     for (var clase in clases) {
       final claveMat = clase.claveMat ?? '';
-      
+
       if (!_coloresPorMateria.containsKey(claveMat)) {
-        _coloresPorMateria[claveMat] = coloresMaterias[colorIndex % coloresMaterias.length];
+        _coloresPorMateria[claveMat] =
+            coloresMaterias[colorIndex % coloresMaterias.length];
         colorIndex++;
       }
 
       final horaInicio = clase.horarioInicio;
       final indexHora = horas.indexWhere((h) => horaInicio.startsWith(h));
-      
+
       if (indexHora != -1) {
         final creditos = clase.materia?.creditos ?? 5;
-        int diasAMostrar = 5; // Por defecto lunes a viernes 
-        
+        int diasAMostrar = 5; // Por defecto lunes a viernes
+
         if (creditos == 4) {
           diasAMostrar = 4; // Lunes a jueves
         } else if (creditos >= 5) {
           diasAMostrar = 5; // Lunes a viernes
-        } 
-        
+        }
+
         for (int dia = 0; dia < diasAMostrar; dia++) {
           final key = '$dia-$indexHora';
           _horarioMap[key] = clase;
@@ -101,9 +118,7 @@ class _HorarioWidgetState extends State<HorarioWidget> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Center(
-        child: CircularProgressIndicator(color: Color(0xff1b3a6b)),
-      );
+      return Center(child: CircularProgressIndicator(color: Color(0xff1b3a6b)));
     }
 
     if (_clases.isEmpty) {
@@ -158,7 +173,8 @@ class _HorarioWidgetState extends State<HorarioWidget> {
                     border: TableBorder.all(color: Colors.grey.shade300),
                     columnWidths: {
                       0: FixedColumnWidth(70),
-                      for (var i = 1; i <= dias.length; i++) i: FlexColumnWidth(),
+                      for (var i = 1; i <= dias.length; i++)
+                        i: FlexColumnWidth(),
                     },
                     children: [
                       TableRow(
@@ -172,15 +188,17 @@ class _HorarioWidgetState extends State<HorarioWidget> {
                               ),
                             ),
                           ),
-                          ...dias.map((d) => TableCell(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    d,
-                                    style: TextStyle(fontWeight: FontWeight.bold),
-                                  ),
+                          ...dias.map(
+                            (d) => TableCell(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  d,
+                                  style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
-                              )),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                       for (int h = 0; h < horas.length; h++)
@@ -194,20 +212,23 @@ class _HorarioWidgetState extends State<HorarioWidget> {
                             ),
                             ...List.generate(dias.length, (d) {
                               final clase = _getClaseEnHorario(d, h);
-                              
+
                               if (clase != null && clase.materia != null) {
                                 final nombreCorto = clase.materia!.nombreCorto;
                                 final claveMat = clase.claveMat ?? '';
-                                final color = _coloresPorMateria[claveMat] ?? Colors.grey[300]!;
+                                final color =
+                                    _coloresPorMateria[claveMat] ??
+                                    Colors.grey[300]!;
 
                                 return TableCell(
                                   child: GestureDetector(
                                     onTap: () {
                                       showDialog(
                                         context: context,
-                                        builder: (_) => DetalleMateriaDialog(
-                                          clase: clase,
-                                        ),
+                                        builder:
+                                            (_) => DetalleMateriaDialog(
+                                              clase: clase,
+                                            ),
                                       );
                                     },
                                     child: Container(
@@ -258,6 +279,45 @@ class DetalleMateriaDialog extends StatelessWidget {
 
   const DetalleMateriaDialog({Key? key, required this.clase}) : super(key: key);
 
+  void _navigateToMap(BuildContext context, String aula) {
+
+    if (salonesUbicaciones.containsKey(aula)) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MyMap(
+            markerLocation: salonesUbicaciones[aula],
+            markerLabel: aula,
+            showDrawerBackButton: true,
+          ),
+        ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Row(
+            children: [
+              Icon(Icons.error_outline, color: Colors.red),
+              SizedBox(width: 8),
+              Text('Salón no encontrado'),
+            ],
+          ),
+          content: Text('El salón "$aula" no se encuentra en el mapa.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'Aceptar',
+                style: TextStyle(color: Color(0xff1b3a6b)),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final materia = clase.materia;
@@ -298,7 +358,7 @@ class DetalleMateriaDialog extends StatelessWidget {
                     Container(
                       padding: EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.blue[200],
+                        color: Colors.blue[200],// Cambia el color algun dia
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
@@ -389,7 +449,37 @@ class DetalleMateriaDialog extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
+                      final aula = grupo?.aula;
+                      
+                      if (aula == null || aula.isEmpty) {
+                        showDialog(
+                          context: context,
+                          builder: (dialogContext) => AlertDialog(
+                            title: Row(
+                              children: [
+                                Icon(Icons.warning, color: Colors.orange),
+                                SizedBox(width: 8),
+                                Text('Sin información'),
+                              ],
+                            ),
+                            content: Text('No se encontró información del aula para esta clase.'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(dialogContext),
+                                child: Text(
+                                  'Aceptar',
+                                  style: TextStyle(color: Color(0xff1b3a6b)),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                        return;
+                      }
+
                       Navigator.pop(context);
+                      
+                      _navigateToMap(context, aula);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xff1b3a6b),

@@ -6,8 +6,12 @@ import 'package:applicatec/widgets/Scaffold.dart';
 import 'package:applicatec/widgets/Service.dart';
 import 'package:applicatec/Helpers/ChangePassword.dart';
 import 'package:applicatec/Helpers/SecureStorage.dart';
-import 'package:applicatec/models/AlumnoModel.dart';
+import 'package:applicatec/Models/AlumnoModel.dart';
+import 'package:applicatec/Models/ClaseModel.dart';
+import 'package:applicatec/Models/CalificacionModel.dart';
 import 'package:applicatec/services/AlumnoService.dart';
+import 'package:applicatec/services/ClaseService.dart';
+import 'package:applicatec/services/CalificacionService.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:applicatec/Helpers/materia_expansion_panel.dart';
@@ -25,12 +29,17 @@ class _CalificacionesState extends State<Calificaciones> {
   bool _isLoading = true;
   String? _errorMessage;
 
+  List<ClaseModel> _clases = [];
+  Map<String, List<CalificacionModel>> _calificacionesPorClase = {};
+  bool _isLoadingData = true;
+
   int myIndex = 0;
 
   @override
   void initState() {
     super.initState();
     _loadAlumnoData();
+    _loadData();
   }
 
   Future<void> _loadAlumnoData() async {
@@ -63,332 +72,169 @@ class _CalificacionesState extends State<Calificaciones> {
     }
   }
 
-  late final List<Widget> widgetsList = [
-    SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            elevation: 4,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.feed_outlined, color: Colors.grey),
-                      const SizedBox(width: 8),
-                      Text(
-                        "Impresión de boleta",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xff1b3a6b),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  DropdownButtonFormField<String>(
-                    isExpanded: true,
-                    decoration: InputDecoration(
-                      labelText: "Periodo",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    items: const [
-                      DropdownMenuItem(
-                        value: "periodo1",
-                        child: Text(
-                          "Seleccione periodo",
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                      ),
-                    ],
-                    onChanged: (value) {},
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xff1b3a6b),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text(
-                        "Descargar boleta",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontFamily: "Montserrat",
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            elevation: 4,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.book_outlined, color: Colors.grey),
-                      const SizedBox(width: 8),
-                      Text(
-                        "Calificaciones",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xff1b3a6b),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  MateriaExpansionPanel(
-                    data: MateriaPanelData(
-                      titulo: "TALLER DE INVESTIGACION II",
-                      materia: "TALLER DE INVESTIGACION II",
-                      docente: "MARIA ARACELY MARTINEZ AMAYA",
-                      creditos: "4",
-                      grupo: "gB",
-                      clave: "ACA0910",
-                      dias: ["Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom"],
-                      horarios: [
-                        "10:00 - 11:00 EB02",
-                        "10:00 - 11:00 EB02",
-                        "10:00 - 11:00 EB02",
-                        "10:00 - 11:00 EB02",
-                        "-",
-                        "-",
-                        "-",
-                      ],
-                      califTitulos: ["U01", "U02", "U03", "Final"],
-                      califValores: ["20", "70", "69", "0"],
-                    ),
-                  ),
+  Future<void> _loadData() async {
+    try {
+      setState(() => _isLoadingData = true);
 
-                  MateriaExpansionPanel(
-                    data: MateriaPanelData(
-                      titulo: "SISTEMAS OPERATIVOS",
-                      materia: "SISTEMAS OPERATIVOS",
-                      docente: "EDGAR CERVANTES LOPEZ",
-                      creditos: "4",
-                      grupo: "gA",
-                      clave: "AEC1061",
-                      dias: ["Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom"],
-                      horarios: [
-                        "09:00 - 10:00 CC01",
-                        "09:00 - 10:00 CC01",
-                        "09:00 - 10:00 CC01",
-                        "09:00 - 10:00 CC01",
-                        "-",
-                        "-",
-                        "-",
-                      ],
-                      califTitulos: [
-                        "U01",
-                        "U02",
-                        "U03",
-                        "U04",
-                        "U05",
-                        "U06",
-                        "Final",
-                      ],
-                      califValores: [
-                        "0 - NC",
-                        "0 - NC",
-                        "0 - NC",
-                        "0 - NC",
-                        "0 - NC",
-                        "0 - NC",
-                        "0 - NC",
-                      ],
-                    ),
-                  ),
+      final clases = await ClaseService.getClasesPorEstudiante(widget.numControl);
+      final calificaciones = await CalificacionService.getCalificacionesPorEstudiante(widget.numControl);
 
-                  MateriaExpansionPanel(
-                    data: MateriaPanelData(
-                      titulo: "PRUEBAS DE SOFTWARE",
-                      materia: "PRUEBAS DE SOFTWARE",
-                      docente: "MARIA DEL ROSARIO GONZALEZ ALVAREZ",
-                      creditos: "4",
-                      grupo: "gA",
-                      clave: "ISC2102",
-                      dias: ["Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom"],
-                      horarios: [
-                        "08:00 - 09:00 EB03",
-                        "08:00 - 09:00 EB03",
-                        "08:00 - 09:00 EB03",
-                        "08:00 - 09:00 EB03",
-                        "-",
-                        "-",
-                        "-",
-                      ],
-                      califTitulos: ["U01", "U02", "U03", "U04", "Final"],
-                      califValores: [
-                        "0 - NC",
-                        "0 - NC",
-                        "0 - NC",
-                        "0 - NC",
-                        "0 - NC",
-                      ],
-                    ),
-                  ),
+      Map<String, List<CalificacionModel>> califPorClase = {};
+      for (var calif in calificaciones) {
+        final idClaseStr = calif.idClase.toString();
+        if (!califPorClase.containsKey(idClaseStr)) {
+          califPorClase[idClaseStr] = [];
+        }
+        califPorClase[idClaseStr]!.add(calif);
+      }
 
-                  MateriaExpansionPanel(
-                    data: MateriaPanelData(
-                      titulo: "METODOS AGILES",
-                      materia: "METODOS AGILES",
-                      docente: "RICARDO RAFAEL QUINTERO MEZA",
-                      creditos: "4",
-                      grupo: "gB",
-                      clave: "ISC2103",
-                      dias: ["Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom"],
-                      horarios: [
-                        "12:00 - 13:00 EB01",
-                        "12:00 - 13:00 EB01",
-                        "12:00 - 13:00 EB01",
-                        "12:00 - 13:00 EB01",
-                        "-",
-                        "-",
-                        "-",
-                      ],
-                      califTitulos: [
-                        "U01",
-                        "U02",
-                        "U03",
-                        "U04",
-                        "U05",
-                        "Final",
-                      ],
-                      califValores: [
-                        "0 - NC",
-                        "0 - NC",
-                        "0 - NC",
-                        "0 - NC",
-                        "0 - NC",
-                        "0 - NC",
-                      ],
-                    ),
-                  ),
+      setState(() {
+        _clases = clases;
+        _calificacionesPorClase = califPorClase;
+        _isLoadingData = false;
+      });
+    } catch (e) {
+      setState(() => _isLoadingData = false);
+    }
+  }
 
-                  MateriaExpansionPanel(
-                    data: MateriaPanelData(
-                      titulo: "ARQUITECTURA DE SOFTWARE (OPTATIVA)",
-                      materia: "ARQUITECTURA DE SOFTWARE (OPTATIVA)",
-                      docente: "CATALINA DE LA LUZ SOSA OCHOA",
-                      creditos: "4",
-                      grupo: "gA",
-                      clave: "ISC2104",
-                      dias: ["Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom"],
-                      horarios: [
-                        "18:00 - 19:00 CCCD",
-                        "18:00 - 19:00 CCCD",
-                        "18:00 - 19:00 CCCD",
-                        "18:00 - 19:00 CCCD",
-                        "-",
-                        "-",
-                        "-",
-                      ],
-                      califTitulos: [
-                        "U01",
-                        "U02",
-                        "U03",
-                        "U04",
-                        "U05",
-                        "Final",
-                      ],
-                      califValores: [
-                        "0 - NC",
-                        "0 - NC",
-                        "0 - NC",
-                        "0 - NC",
-                        "0 - NC",
-                        "0 - NC",
-                      ],
-                    ),
-                  ),
+  List<MateriaPanelData> _buildMateriaPanelDataList() {
+    List<MateriaPanelData> panelDataList = [];
 
-                  MateriaExpansionPanel(
-                    data: MateriaPanelData(
-                      titulo: "ADMINISTRACION DE REDES",
-                      materia: "ADMINISTRACION DE REDES",
-                      docente: "EDGAR CERVANTES LOPEZ",
-                      creditos: "4",
-                      grupo: "gC",
-                      clave: "SCA1002",
-                      dias: ["Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom"],
-                      horarios: [
-                        "11:00 - 12:00 CCDS",
-                        "11:00 - 12:00 CCDS",
-                        "11:00 - 12:00 CCDS",
-                        "11:00 - 12:00 CCDS",
-                        "-",
-                        "-",
-                        "-",
-                      ],
-                      califTitulos: ["U01", "U02", "U03", "U04", "Final"],
-                      califValores: [
-                        "0 - NC",
-                        "0 - NC",
-                        "0 - NC",
-                        "0 - NC",
-                        "0 - NC",
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-        ],
-      ),
-    ), // Inicio
+    for (var clase in _clases) {
+      if (clase.materia == null) continue;
 
-    MyMap(), // Mapa Tec
+      final materia = clase.materia!;
+      final maestro = clase.maestro;
+      final grupo = clase.grupo;
 
-    Service(), // Servicios medicos
+      final creditos = materia.creditos ?? 5;
+      int diasAMostrar = creditos == 4 ? 4 : 5;
 
-    News(), // Noticias
-  ];
+      List<String> dias = ["Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom"];
+      List<String> horarios = [];
+
+      for (int i = 0; i < 7; i++) {
+        if (i < diasAMostrar) {
+          final aula = grupo?.aula ?? 'N/A';
+          horarios.add('${clase.horarioInicio} - ${clase.horarioFin ?? "N/A"} $aula');
+        } else {
+          horarios.add('-');
+        }
+      }
+
+      final idClaseStr = clase.idclase;
+      final calificaciones = _calificacionesPorClase[idClaseStr] ?? [];
+
+      List<String> califTitulos = [];
+      List<String> califValores = [];
+
+      if (calificaciones.isEmpty) {
+        int numUnidades = creditos == 4 ? 4 : 6;
+        for (int i = 1; i <= numUnidades; i++) {
+          califTitulos.add('U${i.toString().padLeft(2, '0')}');
+          califValores.add('0');
+        }
+        califTitulos.add('Final');
+        califValores.add('0');
+      } else {
+        for (var calif in calificaciones) {
+          if (calif.unidad.toUpperCase() == 'FINAL') {
+            califTitulos.add('Final');
+            califValores.add(calif.califFinal?.toInt().toString() ?? '0');
+          } else {
+            califTitulos.add(calif.unidad.toUpperCase());
+            califValores.add(calif.calificacion?.toInt().toString() ?? '0');
+          }
+        }
+      }
+
+      panelDataList.add(
+        MateriaPanelData(
+          titulo: materia.nombreMat,
+          materia: materia.nombreMat,
+          docente: maestro?.nombreCompleto ?? 'Sin asignar',
+          creditos: materia.creditos?.toString() ?? '0',
+          grupo: grupo?.claveGrupo ?? 'N/A',
+          clave: materia.claveMat,
+          dias: dias,
+          horarios: horarios,
+          califTitulos: califTitulos,
+          califValores: califValores,
+        ),
+      );
+    }
+
+    return panelDataList;
+  }
 
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Scaffold(
         backgroundColor: const Color(0xff1b3a6b),
-        body: Center(
-          child: CircularProgressIndicator(color: Colors.white),
-        ),
+        body: Center(child: CircularProgressIndicator(color: Colors.white)),
       );
     }
+
+    final widgetsList = [
+      SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 4,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.book_outlined, color: Colors.grey),
+                        const SizedBox(width: 8),
+                        Text(
+                          "Calificaciones",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xff1b3a6b),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    
+                    if (_isLoadingData)
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(32.0),
+                          child: CircularProgressIndicator(
+                            color: Color(0xff1b3a6b),
+                          ),
+                        ),
+                      )
+                    else
+                      ..._buildMateriaPanelDataList().map(
+                        (data) => MateriaExpansionPanel(data: data),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+      MyMap(),
+      Service(),
+      News(),
+    ];
 
     return Scaffold(
       appBar: myIndex == 0 ? _buildAppBar() : null,

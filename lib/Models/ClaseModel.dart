@@ -3,7 +3,7 @@ import 'package:applicatec/Models/MaestroModel.dart';
 import 'package:applicatec/Models/MateriaModel.dart';
 
 class ClaseModel {
-  final String idClase;
+  final String idclase;
   final String horarioInicio;
   final String? horarioFin;
   final String? claveGrupo;
@@ -16,7 +16,7 @@ class ClaseModel {
   final MaestroModel? maestro;
 
   ClaseModel({
-    required this.idClase,
+    required this.idclase,
     required this.horarioInicio,
     this.horarioFin,
     this.claveGrupo,
@@ -29,7 +29,7 @@ class ClaseModel {
 
   factory ClaseModel.fromJson(Map<String, dynamic> json) {
     return ClaseModel(
-      idClase: json['id_Clase']?.toString() ?? '',
+      idclase: json['id_Clase']?.toString() ?? '',
       horarioInicio: json['horario_inicio']?.toString() ?? '',
       horarioFin: json['horario_fin']?.toString(),
       claveGrupo: json['clave_grupo']?.toString(),
@@ -43,7 +43,7 @@ class ClaseModel {
 
   Map<String, dynamic> toJson() {
     return {
-      'id_Clase': idClase,
+      'id_Clase': idclase,
       'horario_inicio': horarioInicio,
       'horario_fin': horarioFin,
       'clave_grupo': claveGrupo,

@@ -1,4 +1,5 @@
 import 'package:applicatec/Helpers/DrawerMenu.dart';
+import 'package:applicatec/Helpers/avance_academico_view.dart';
 import 'package:applicatec/Helpers/kardex_card.dart';
 import 'package:applicatec/widgets/Login.dart';
 import 'package:applicatec/widgets/Map.dart';
@@ -7,7 +8,7 @@ import 'package:applicatec/widgets/Scaffold.dart';
 import 'package:applicatec/widgets/Service.dart';
 import 'package:applicatec/Helpers/ChangePassword.dart';
 import 'package:applicatec/Helpers/SecureStorage.dart';
-import 'package:applicatec/models/AlumnoModel.dart';
+import 'package:applicatec/Models/AlumnoModel.dart';
 import 'package:applicatec/services/AlumnoService.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -63,31 +64,6 @@ class _KardexState extends State<Kardex> {
     }
   }
 
-  late final List<Widget> widgetsList = [
-    SingleChildScrollView(
-      child: Center(
-        child: KardexCard(
-          nombre: "JOSE JOAQUIN ESTRADA MENDOZA",
-          matricula: "21170312",
-          carrera: "INGENIERIA EN SISTEMAS COMPUTACIONALES",
-          especialidad: "ING. DE SOFTWARE",
-          semestre: 9,
-          situacion: "VIGENTE",
-          creditosAcumulados: 203,
-          creditosTotales: 260,
-          periodoIngreso: "2021SEM3",
-          porcentajeAvance: 78.08,
-        ),
-      ),
-    ), // Inicio
-
-    MyMap(), // Mapa Tec
-
-    Service(), // Servicios medicos
-
-    News(), // Noticias
-  ];
-
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -97,12 +73,73 @@ class _KardexState extends State<Kardex> {
       );
     }
 
+    if (_errorMessage != null || _alumnoData == null) {
+      return Scaffold(
+        backgroundColor: const Color(0xff1b3a6b),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error_outline, color: Colors.white, size: 48),
+              SizedBox(height: 16),
+              Text(
+                _errorMessage ?? 'No se encontraron datos',
+                style: TextStyle(color: Colors.white, fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    
+    final widgetsList = [
+      SingleChildScrollView(
+        child: Column(
+          children: [
+            KardexCard(
+            nombre: _alumnoData!.nombreCompleto.toUpperCase(),
+            matricula: _alumnoData!.numControl,
+            carrera: _alumnoData!.nombreCarrera ?? 'CARRERA NO ESPECIFICADA',
+            especialidad: _alumnoData!.especialidad.isNotEmpty 
+                ? _alumnoData!.especialidad 
+                : 'SIN ESPECIALIDAD',
+            semestre: _alumnoData!.semestre ?? 0,
+            situacion: _alumnoData!.situacion.toUpperCase(),
+            creditosAcumulados: _alumnoData!.creditosAcumulados ?? 0,
+            creditosTotales: 260, 
+            periodoIngreso: _alumnoData!.periodoIngreso,
+            porcentajeAvance: _calcularPorcentajeAvance(
+              _alumnoData!.creditosAcumulados ?? 0,
+              260,
+            ),
+          ),
+            SizedBox(height: 16),
+            AvanceAcademicoView(numControl: widget.numControl),
+          ],
+        ),
+      ),
+      MyMap(),
+      Service(),
+      News(),
+    ];
+
     return Scaffold(
       appBar: myIndex == 0 ? _buildAppBar() : null,
       drawer: myIndex == 0 ? DrawerMenu(numControl: widget.numControl) : null,
       body: widgetsList[myIndex],
       bottomNavigationBar: _buildBottomNavigationBar(),
     );
+  }
+
+  // Método para calcular el porcentaje de avance
+  double _calcularPorcentajeAvance(
+    int creditosAcumulados,
+    int creditosTotales,
+  ) {
+    if (creditosTotales == 0) return 0.0;
+    return (creditosAcumulados / creditosTotales) * 100;
   }
 
   AppBar _buildAppBar() {

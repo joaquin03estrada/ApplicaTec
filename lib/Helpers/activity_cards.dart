@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:applicatec/models/EstudianteActividadModel.dart';
 
 class ActivityCard extends StatelessWidget {
   final String title;
   final Widget content;
 
   const ActivityCard({Key? key, required this.title, required this.content})
-    : super(key: key);
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +37,7 @@ class ActivityCard extends StatelessWidget {
                         color: Color(0xff1b3a6b),
                       ),
                       overflow: TextOverflow.ellipsis,
-                      maxLines: 2, 
+                      maxLines: 2,
                     ),
                   ),
                 ],
@@ -61,7 +62,7 @@ class EmptyActivityContent extends StatelessWidget {
   final String message;
 
   const EmptyActivityContent({Key? key, required this.message})
-    : super(key: key);
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -72,72 +73,79 @@ class EmptyActivityContent extends StatelessWidget {
   }
 }
 
-class ExtraschoolActivity {
-  final String code;
-  final String name;
-  final String period;
-  final double score;
-  final String evaluation;
-  final int credits;
+class LoadingActivityContent extends StatelessWidget {
+  const LoadingActivityContent({Key? key}) : super(key: key);
 
-  const ExtraschoolActivity({
-    required this.code,
-    required this.name,
-    required this.period,
-    required this.score,
-    required this.evaluation,
-    required this.credits,
-  });
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: CircularProgressIndicator(
+          color: Color(0xff1b3a6b),
+        ),
+      ),
+    );
+  }
 }
 
-class ExtraschoolActivityContent extends StatelessWidget {
-  final ExtraschoolActivity activity;
-  final VoidCallback onDownload;
+// Widget genérico para mostrar actividades
+class ActividadesContent extends StatelessWidget {
+  final List<EstudianteActividadModel> actividades;
 
-  const ExtraschoolActivityContent({
+  const ActividadesContent({
     Key? key,
-    required this.activity,
-    required this.onDownload,
+    required this.actividades,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Text(
-                '${activity.code} - ${activity.name}',
-                style: const TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 2,
+      children: actividades.asMap().entries.map((entry) {
+        int index = entry.key;
+        EstudianteActividadModel estudianteActividad = entry.value;
+        final actividad = estudianteActividad.actividad;
+        
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      '${actividad?.claveAct ?? 'N/A'} - ${actividad?.nombre ?? 'Sin nombre'}',
+                      style: const TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                    ),
+                  ),
+                ],
               ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.download, color: Colors.black87),
-              onPressed: onDownload,
-              tooltip: 'Descargar información',
-            ),
-          ],
-        ),
-        const SizedBox(height: 4.0),
-        Text(
-          'Periodo: ${activity.period}',
-          style: const TextStyle(fontSize: 16.0, color: Colors.black87),
-        ),
-        const SizedBox(height: 4.0),
-        Text(
-          'Calificación: ${activity.score.toStringAsFixed(2)} (${activity.evaluation}) - Créditos: ${activity.credits}',
-          style: const TextStyle(fontSize: 16.0, color: Colors.black87),
-        ),
-      ],
+              const SizedBox(height: 4.0),
+              Text(
+                'Periodo: ${estudianteActividad.periodo ?? 'N/A'}',
+                style: const TextStyle(fontSize: 16.0, color: Colors.black87),
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 4.0),
+              Text(
+                'Calificación: ${estudianteActividad.calificacion ?? 'N/A'} - Créditos: ${actividad?.creditos ?? 0}',
+                style: const TextStyle(fontSize: 16.0, color: Colors.black87),
+                overflow: TextOverflow.ellipsis,
+              ),
+              if (index < actividades.length - 1)
+                const Divider(height: 24.0, thickness: 1.0),
+            ],
+          ),
+        );
+      }).toList(),
     );
   }
 }

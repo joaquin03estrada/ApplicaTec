@@ -37,8 +37,6 @@ class _KardexCardState extends State<KardexCard> {
   @override
   void initState() {
     super.initState();
-    _options = [widget.carrera, "Inglés"];
-    _selectedOption = _options[0];
   }
 
   @override
@@ -103,71 +101,9 @@ class _KardexCardState extends State<KardexCard> {
                       ),
                     ],
                   ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: _selectedOption,
-                      icon: Icon(
-                        Icons.arrow_drop_down,
-                        color: Colors.grey[600],
-                      ),
-                      isExpanded: true, 
-                      itemHeight: null, 
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      borderRadius: BorderRadius.circular(8),
-                      alignment: AlignmentDirectional.centerStart,
-                      items:
-                          _options.map((String option) {
-                            return DropdownMenuItem<String>(
-                              value: option,
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(vertical: 8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    if (option == _selectedOption)
-                                      Container(
-                                        width: constraints.maxWidth - 60,
-                                        child: Text(
-                                          "Selecciona una carrera",
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.grey[600],
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    Container(
-                                      width: constraints.maxWidth - 60,
-                                      child: Text(
-                                        option,
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 2,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                      onChanged: (String? newValue) {
-                        if (newValue != null) {
-                          setState(() {
-                            _selectedOption = newValue;
-                          });
-                        }
-                      },
-                    ),
-                  ),
                 );
               },
             ),
-
-            const SizedBox(height: 20),
 
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,

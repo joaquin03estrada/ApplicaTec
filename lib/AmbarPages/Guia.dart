@@ -6,7 +6,7 @@ import 'package:applicatec/widgets/Scaffold.dart';
 import 'package:applicatec/widgets/Service.dart';
 import 'package:applicatec/Helpers/ChangePassword.dart';
 import 'package:applicatec/Helpers/SecureStorage.dart';
-import 'package:applicatec/models/AlumnoModel.dart';
+import 'package:applicatec/Models/AlumnoModel.dart';
 import 'package:applicatec/services/AlumnoService.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';

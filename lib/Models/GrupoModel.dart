@@ -8,16 +8,22 @@ class GrupoModel {
   });
 
   factory GrupoModel.fromJson(Map<String, dynamic> json) {
-    return GrupoModel(
-      claveGrupo: json['Clave_grupo']?.toString() ?? '',
-      aula: json['Aula']?.toString() ?? '',
+    print('[GrupoModel] JSON recibido: $json');
+    
+    final grupo = GrupoModel(
+      claveGrupo: json['clave_grupo']?.toString() ?? '',  
+      aula: json['aula']?.toString() ?? '',  
     );
+    
+    print('[GrupoModel] Parseado - Clave: ${grupo.claveGrupo}, Aula: ${grupo.aula}');
+    
+    return grupo;
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'Clave_grupo': claveGrupo,
-      'Aula': aula,
+      'clave_grupo': claveGrupo,  
+      'aula': aula,  
     };
   }
 }

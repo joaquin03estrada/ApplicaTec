@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class MateriaPanelData {
+class MateriaPanelData { 
   final String titulo;
   final String materia;
   final String docente;

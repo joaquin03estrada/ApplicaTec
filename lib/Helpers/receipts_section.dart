@@ -6,12 +6,14 @@ class ReceiptsSection extends StatelessWidget {
   final List<ReceiptNotice> notices;
   final List<Receipt> receipts;
   final VoidCallback onHistoryPressed;
+  final bool isLoading;
 
   const ReceiptsSection({
     Key? key,
     required this.notices,
     required this.receipts,
     required this.onHistoryPressed,
+    this.isLoading = false,
   }) : super(key: key);
 
   @override
@@ -36,22 +38,57 @@ class ReceiptsSection extends StatelessWidget {
                   ),
                 ),
               ),
-
               Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   HistoryButton(onPressed: onHistoryPressed),
                   const SizedBox(height: 8.0),
-                  FacturaButton(onPressed: onHistoryPressed),
+                  FacturaButton(onPressed: () {}),
                 ],
               ),
             ],
           ),
         ),
 
-        // Receipts cards
-        ...receipts.map((receipt) => ReceiptCard(receipt: receipt)),
+        // Loading, empty state o receipts cards
+        if (isLoading)
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: CircularProgressIndicator(
+                color: Color(0xFF1A365D),
+              ),
+            ),
+          )
+        else if (receipts.isEmpty)
+          Card(
+            elevation: 4,
+            margin: const EdgeInsets.all(16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: Center(
+                child: Column(
+                  children: [
+                    Icon(Icons.receipt_long, size: 64, color: Colors.grey[400]),
+                    SizedBox(height: 16),
+                    Text(
+                      'No hay recibos disponibles',
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          )
+        else
+          ...receipts.map((receipt) => ReceiptCard(receipt: receipt)),
       ],
     );
   }
@@ -235,15 +272,19 @@ class ReceiptCard extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
                   ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 3,
                 ),
                 const SizedBox(height: 8.0),
                 Text(
                   'Emisión: ${dateFormatter.format(receipt.issueDate)}',
                   style: const TextStyle(fontSize: 14.0, color: Colors.black87),
+                  overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   'Vigencia: ${dateFormatter.format(receipt.dueDate)}',
                   style: const TextStyle(fontSize: 14.0, color: Colors.black87),
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 8.0),
                 Text(
@@ -253,6 +294,7 @@ class ReceiptCard extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
                   ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),

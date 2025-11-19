@@ -6,8 +6,10 @@ import 'package:applicatec/widgets/Scaffold.dart';
 import 'package:applicatec/widgets/Service.dart';
 import 'package:applicatec/Helpers/ChangePassword.dart';
 import 'package:applicatec/Helpers/SecureStorage.dart';
-import 'package:applicatec/models/AlumnoModel.dart';
+import 'package:applicatec/Models/AlumnoModel.dart';
+import 'package:applicatec/models/EstudianteActividadModel.dart';
 import 'package:applicatec/services/AlumnoService.dart';
+import 'package:applicatec/services/EstudianteActividadService.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:applicatec/Helpers/activity_cards.dart';
@@ -16,7 +18,7 @@ class Historiactividades extends StatefulWidget {
   final String numControl;
 
   const Historiactividades({Key? key, required this.numControl})
-    : super(key: key);
+      : super(key: key);
   @override
   State<Historiactividades> createState() => _HistoriactividadesState();
 }
@@ -26,14 +28,10 @@ class _HistoriactividadesState extends State<Historiactividades> {
   bool _isLoading = true;
   String? _errorMessage;
 
-  final actividadViolin = ExtraschoolActivity(
-    code: 'PCD-VIO',
-    name: 'VIOLIN',
-    period: '2022SEM3',
-    score: 4.00,
-    evaluation: 'EXCELENTE',
-    credits: 1,
-  );
+  List<EstudianteActividadModel> _actividadesComplementarias = [];
+  List<EstudianteActividadModel> _actividadesExtraescolares = [];
+  List<EstudianteActividadModel> _tutorias = [];
+  bool _isLoadingActividades = true;
 
   int myIndex = 0;
 
@@ -41,6 +39,7 @@ class _HistoriactividadesState extends State<Historiactividades> {
   void initState() {
     super.initState();
     _loadAlumnoData();
+    _loadActividades();
   }
 
   Future<void> _loadAlumnoData() async {
@@ -73,41 +72,89 @@ class _HistoriactividadesState extends State<Historiactividades> {
     }
   }
 
-  late final List<Widget> widgetsList = [
-    SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ActivityCard(
-            title: 'Actividades complementarias',
-            content: const EmptyActivityContent(
-              message: 'No cuenta con actividades complementarias registradas',
-            ),
-          ),
-          ActivityCard(
-            title: 'Actividades extraescolares',
-            content: ExtraschoolActivityContent(
-              activity: actividadViolin,
-              onDownload: () {},
-            ),
-          ),
-          ActivityCard(
-            title: 'Tutorías',
-            content: const EmptyActivityContent(
-              message: 'No cuenta con tutorías registradas',
-            ),
-          ),
-        ],
-      ),
-    ), // Inicio
+  Future<void> _loadActividades() async {
+    try {
+      setState(() => _isLoadingActividades = true);
 
-    MyMap(), // Mapa Tec
+      final actividades =
+          await EstudianteActividadService.getActividadesPorEstudiante(
+        widget.numControl,
+      );
 
-    Service(), // Servicios medicos
+      // Clasificar actividades por tipo
+      _clasificarActividades(actividades);
 
-    News(), // Noticias
-  ];
+      setState(() {
+        _isLoadingActividades = false;
+      });
+    } catch (e) {
+      print('Error cargando actividades: $e');
+      setState(() => _isLoadingActividades = false);
+    }
+  }
+
+  void _clasificarActividades(List<EstudianteActividadModel> actividades) {
+    _actividadesComplementarias.clear();
+    _actividadesExtraescolares.clear();
+    _tutorias.clear();
+
+    for (var estudianteActividad in actividades) {
+      final tipoActividad =
+          estudianteActividad.actividad?.tipoActividad?.toLowerCase() ?? '';
+
+      if (tipoActividad.contains('complementaria')) {
+        _actividadesComplementarias.add(estudianteActividad);
+      } else if (tipoActividad.contains('extraescolar')) {
+        _actividadesExtraescolares.add(estudianteActividad);
+      } else if (tipoActividad.contains('tutoria')) {
+        _tutorias.add(estudianteActividad);
+      } else {
+        _actividadesComplementarias.add(estudianteActividad);
+      }
+    }
+  }
+
+  Widget _buildActividadesComplementariasContent() {
+    if (_isLoadingActividades) {
+      return const LoadingActivityContent();
+    }
+
+    if (_actividadesComplementarias.isEmpty) {
+      return const EmptyActivityContent(
+        message: 'No cuenta con actividades complementarias registradas',
+      );
+    }
+
+    return ActividadesContent(actividades: _actividadesComplementarias);
+  }
+
+  Widget _buildActividadesExtraescolaresContent() {
+    if (_isLoadingActividades) {
+      return const LoadingActivityContent();
+    }
+
+    if (_actividadesExtraescolares.isEmpty) {
+      return const EmptyActivityContent(
+        message: 'No cuenta con actividades extraescolares registradas',
+      );
+    }
+
+    return ActividadesContent(actividades: _actividadesExtraescolares);
+  }
+
+  Widget _buildTutoriasContent() {
+    if (_isLoadingActividades) {
+      return const LoadingActivityContent();
+    }
+
+    if (_tutorias.isEmpty) {
+      return const EmptyActivityContent(
+        message: 'No cuenta con tutorías registradas',
+      );
+    }
+
+    return ActividadesContent(actividades: _tutorias);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,6 +164,32 @@ class _HistoriactividadesState extends State<Historiactividades> {
         body: Center(child: CircularProgressIndicator(color: Colors.white)),
       );
     }
+
+    final widgetsList = [
+      SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ActivityCard(
+              title: 'Actividades complementarias',
+              content: _buildActividadesComplementariasContent(),
+            ),
+            ActivityCard(
+              title: 'Actividades extraescolares',
+              content: _buildActividadesExtraescolaresContent(),
+            ),
+            ActivityCard(
+              title: 'Tutorías',
+              content: _buildTutoriasContent(),
+            ),
+          ],
+        ),
+      ),
+      MyMap(),
+      Service(),
+      News(),
+    ];
 
     return Scaffold(
       appBar: myIndex == 0 ? _buildAppBar() : null,
@@ -156,58 +229,56 @@ class _HistoriactividadesState extends State<Historiactividades> {
       actions: [
         PopupMenuButton<int>(
           icon: const Icon(Icons.person, color: Colors.white),
-          itemBuilder:
-              (context) => [
-                PopupMenuItem(
-                  value: 1,
-                  child: Row(
-                    children: const [
-                      Icon(Icons.password, color: Colors.grey),
-                      SizedBox(width: 8),
-                      Flexible(
-                        child: Text(
-                          "Cambiar Contraseña",
-                          style: TextStyle(overflow: TextOverflow.ellipsis),
-                        ),
-                      ),
-                    ],
+          itemBuilder: (context) => [
+            PopupMenuItem(
+              value: 1,
+              child: Row(
+                children: const [
+                  Icon(Icons.password, color: Colors.grey),
+                  SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      "Cambiar Contraseña",
+                      style: TextStyle(overflow: TextOverflow.ellipsis),
+                    ),
                   ),
-                  onTap: () {
-                    Future.delayed(Duration.zero, () {
-                      showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder:
-                            (context) => ChangePasswordDialog(
-                              numControl: widget.numControl,
-                            ),
-                      );
-                    });
-                  },
-                ),
-                PopupMenuItem(
-                  value: 2,
-                  child: Row(
-                    children: const [
-                      Icon(Icons.logout, color: Colors.grey),
-                      SizedBox(width: 8),
-                      Flexible(
-                        child: Text(
-                          "Cerrar Sesión",
-                          style: TextStyle(overflow: TextOverflow.ellipsis),
-                        ),
-                      ),
-                    ],
+                ],
+              ),
+              onTap: () {
+                Future.delayed(Duration.zero, () {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (context) => ChangePasswordDialog(
+                      numControl: widget.numControl,
+                    ),
+                  );
+                });
+              },
+            ),
+            PopupMenuItem(
+              value: 2,
+              child: Row(
+                children: const [
+                  Icon(Icons.logout, color: Colors.grey),
+                  SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      "Cerrar Sesión",
+                      style: TextStyle(overflow: TextOverflow.ellipsis),
+                    ),
                   ),
-                  onTap: () async {
-                    await SecureStorageHelper.deleteAllData();
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => Login()),
-                    );
-                  },
-                ),
-              ],
+                ],
+              ),
+              onTap: () async {
+                await SecureStorageHelper.deleteAllData();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => Login()),
+                );
+              },
+            ),
+          ],
         ),
       ],
     );

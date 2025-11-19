@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:applicatec/Helpers/salon_sidebar_drawer.dart';
+import 'package:applicatec/constantes/salones_ubicaciones.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -30,15 +31,7 @@ class _MyMapState extends State<MyMap> with AutomaticKeepAliveClientMixin {
   LatLng? _ubicacionActual;
   StreamSubscription<Position>? _positionSubscription;
   bool _mounted = true;
-
-  final Map<String, LatLng> salonesUbicaciones = {
-    "EA01": LatLng(24.788967, -107.398021),
-    "EA02": LatLng(24.788967, -107.398021),
-    "EA03": LatLng(24.788967, -107.398021),
-    "EB01": LatLng(24.788691, -107.398094),
-    "EB02": LatLng(24.788691, -107.398094),
-    // ... más salones
-  };
+  
 
   LatLng? _selectedSalonLocation;
   String? _selectedSalonLabel;

@@ -7,9 +7,7 @@ import 'package:applicatec/widgets/Map.dart';
 import 'package:applicatec/widgets/News.dart';
 import 'package:applicatec/widgets/Scaffold.dart';
 import 'package:applicatec/widgets/Service.dart';
-import 'package:applicatec/models/AlumnoModel.dart';
-import 'package:applicatec/models/ClaseModel.dart';
-import 'package:applicatec/services/ClaseService.dart';
+import 'package:applicatec/Models/AlumnoModel.dart';
 import 'package:applicatec/services/AlumnoService.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -26,8 +24,6 @@ class _HorarioState extends State<Horario> {
   AlumnoModel? _alumnoData;
   bool _isLoading = true;
   String? _errorMessage;
-  List<ClaseModel> _clases = [];
-  bool _isLoadingClases = true;
 
   int myIndex = 0;
 
@@ -35,34 +31,6 @@ class _HorarioState extends State<Horario> {
   void initState() {
     super.initState();
     _loadAlumnoData();
-    _loadClases();
-  }
-
-  Future<void> _loadClases() async {
-    try {
-      setState(() => _isLoadingClases = true);
-
-      final clases = await ClaseService.getClasesPorEstudiante(
-        widget.numControl,
-      );
-
-      setState(() {
-        _clases = clases;
-        _isLoadingClases = false;
-      });
-
-      // Imprimir para debug
-      for (var clase in clases) {
-        print('Clase: ${clase.materia?.nombreMat}');
-        print('Horario: ${clase.horarioInicio} - ${clase.horarioFin}');
-        print('Maestro: ${clase.maestro?.nombreCompleto}');
-        print('Aula: ${clase.grupo?.aula}');
-        print('---');
-      }
-    } catch (e) {
-      print('Error cargando clases: $e');
-      setState(() => _isLoadingClases = false);
-    }
   }
 
   Future<void> _loadAlumnoData() async {
@@ -95,16 +63,6 @@ class _HorarioState extends State<Horario> {
     }
   }
 
-  late final List<Widget> widgetsList = [
-    SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: HorarioWidget(numControl: widget.numControl), 
-    ),
-    MyMap(),
-    Service(),
-    News(),
-  ];
-
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -113,6 +71,16 @@ class _HorarioState extends State<Horario> {
         body: Center(child: CircularProgressIndicator(color: Colors.white)),
       );
     }
+
+    final widgetsList = [
+      SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: HorarioWidget(numControl: widget.numControl),
+      ),
+      MyMap(),
+      Service(),
+      News(),
+    ];
 
     return Scaffold(
       appBar: myIndex == 0 ? _buildAppBar() : null,
@@ -152,58 +120,56 @@ class _HorarioState extends State<Horario> {
       actions: [
         PopupMenuButton<int>(
           icon: const Icon(Icons.person, color: Colors.white),
-          itemBuilder:
-              (context) => [
-                PopupMenuItem(
-                  value: 1,
-                  child: Row(
-                    children: const [
-                      Icon(Icons.password, color: Colors.grey),
-                      SizedBox(width: 8),
-                      Flexible(
-                        child: Text(
-                          "Cambiar Contraseña",
-                          style: TextStyle(overflow: TextOverflow.ellipsis),
-                        ),
-                      ),
-                    ],
+          itemBuilder: (context) => [
+            PopupMenuItem(
+              value: 1,
+              child: Row(
+                children: const [
+                  Icon(Icons.password, color: Colors.grey),
+                  SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      "Cambiar Contraseña",
+                      style: TextStyle(overflow: TextOverflow.ellipsis),
+                    ),
                   ),
-                  onTap: () {
-                    Future.delayed(Duration.zero, () {
-                      showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder:
-                            (context) => ChangePasswordDialog(
-                              numControl: widget.numControl,
-                            ),
-                      );
-                    });
-                  },
-                ),
-                PopupMenuItem(
-                  value: 2,
-                  child: Row(
-                    children: const [
-                      Icon(Icons.logout, color: Colors.grey),
-                      SizedBox(width: 8),
-                      Flexible(
-                        child: Text(
-                          "Cerrar Sesión",
-                          style: TextStyle(overflow: TextOverflow.ellipsis),
-                        ),
-                      ),
-                    ],
+                ],
+              ),
+              onTap: () {
+                Future.delayed(Duration.zero, () {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (context) => ChangePasswordDialog(
+                      numControl: widget.numControl,
+                    ),
+                  );
+                });
+              },
+            ),
+            PopupMenuItem(
+              value: 2,
+              child: Row(
+                children: const [
+                  Icon(Icons.logout, color: Colors.grey),
+                  SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      "Cerrar Sesión",
+                      style: TextStyle(overflow: TextOverflow.ellipsis),
+                    ),
                   ),
-                  onTap: () async {
-                    await SecureStorageHelper.deleteAllData();
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => Login()),
-                    );
-                  },
-                ),
-              ],
+                ],
+              ),
+              onTap: () async {
+                await SecureStorageHelper.deleteAllData();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => Login()),
+                );
+              },
+            ),
+          ],
         ),
       ],
     );
